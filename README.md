@@ -5,9 +5,11 @@ This is the source code to Moonbase Console, a helper program for [Moonbase Comm
 I (Michael Barlow) didn't write this code (though I may add to it in the future). The code was given to me by Ernie Anderson (MYCROFT), and I simply added this file and the MIT license, and uploaded it to github.
 
 Usage instructions are located in Moonbase Console\README.TXT. You will need to open the following ports to play multiplayer matches:
+
 - 2300 (TCP)
 - 2350 (UDP)
 - 47624 (TCP)
+ 
 Thanks Jason Creighton for posting this information on your [blog post](http://jcreigh.blogspot.com.au/2009/04/ports-to-forward-to-host-moonbase.html "blog post")
 
 # CREDITS
