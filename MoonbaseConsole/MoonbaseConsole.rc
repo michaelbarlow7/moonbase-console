@@ -1,0 +1,237 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG1 DIALOG DISCARDABLE  0, 0, 337, 191
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Moonbase Console v2.1.26"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "&Join",IDC_BUTTON2,5,5,105,15
+    PUSHBUTTON      "&Host",IDC_BTN_HOST_GAME,115,5,105,15
+    PUSHBUTTON      "&Single Player",IDC_SINGLE_GENERATE,225,5,105,15,
+                    BS_MULTILINE
+    CONTROL         "Slider1",IDC_SLIDER2,"msctls_trackbar32",TBS_VERT | 
+                    WS_TABSTOP,10,43,20,105
+    CONTROL         "Random",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,15,150,43,10
+    CONTROL         "Slider1",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    TBS_VERT | WS_TABSTOP,55,43,20,105
+    CONTROL         "Random",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,63,151,43,10
+    CONTROL         "Slider1",IDC_SLIDER6,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    TBS_VERT | WS_TABSTOP,111,43,20,105
+    CONTROL         "Random",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,119,151,43,10
+    CONTROL         "Slider1",IDC_SLIDER3,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    TBS_VERT | WS_TABSTOP,165,43,20,105
+    CONTROL         "Random",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,151,43,10
+    CONTROL         "Slider1",IDC_SLIDER4,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    TBS_VERT | WS_TABSTOP,221,43,20,105
+    CONTROL         "Random",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,229,151,43,10
+    CONTROL         "Slider1",IDC_SLIDER5,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    TBS_VERT | WS_TABSTOP,275,43,20,105
+    CONTROL         "Random",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,283,151,42,10
+    GROUPBOX        "Random Map Options",IDC_STATIC,5,25,325,140
+    LTEXT           "Small",IDC_STATIC,75,47,18,8
+    LTEXT           "Medium",IDC_STATIC,75,62,26,8
+    LTEXT           "Large",IDC_STATIC,75,76,19,8
+    LTEXT           "Huge",IDC_STATIC,75,91,18,8
+    LTEXT           "SAI",IDC_STATIC,75,106,12,8
+    LTEXT           "Ridiculous",IDC_STATIC,75,121,34,8
+    LTEXT           "Max",IDC_STATIC,75,136,14,8
+    LTEXT           "Size",IDC_STATIC,55,35,14,8
+    LTEXT           "Energy",IDC_STATIC,165,35,23,8
+    LTEXT           "Terrain",IDC_STATIC,221,35,23,8
+    LTEXT           "Water",IDC_STATIC,275,35,20,8
+    LTEXT           "Spiff",IDC_STATIC,30,47,15,10
+    LTEXT           "Katton",IDC_STATIC,30,136,22,8
+    LTEXT           "Scarce",IDC_STATIC,185,136,24,8
+    LTEXT           "Lots",IDC_STATIC,185,47,14,8
+    LTEXT           "Barren",IDC_STATIC,241,136,22,8
+    LTEXT           "Rough",IDC_STATIC,241,47,22,8
+    LTEXT           "Some",IDC_STATIC,185,91,19,8
+    LTEXT           "Driest",IDC_STATIC,295,136,19,8
+    LTEXT           "Wettest",IDC_STATIC,295,47,26,8
+    LTEXT           "Normal",IDC_STATIC,295,91,23,8
+    LTEXT           "Normal",IDC_STATIC,241,91,23,8
+    LTEXT           "Tileset",IDC_STATIC,111,35,25,8
+    LTEXT           "Terrandra",IDC_STATIC,131,136,32,8
+    LTEXT           "Zanateros",IDC_STATIC,131,118,33,8
+    LTEXT           "Drijim 3",IDC_STATIC,131,100,24,8
+    LTEXT           "Kyanite",IDC_STATIC,131,83,24,8
+    LTEXT           "Emerau Glyph",IDC_STATIC,131,61,29,20
+    LTEXT           "Ablation Laund",IDC_STATIC,131,43,30,16
+    LTEXT           "Algorithm",IDC_STATIC,10,35,30,8
+    PUSHBUTTON      "H&elp",IDC_BUTTON1,5,170,160,14
+    PUSHBUTTON      "&Credits",IDC_BUTTON3,170,170,160,14
+END
+
+IDD_DIALOG2 DIALOG DISCARDABLE  0, 0, 186, 46
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Join Game"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EDIT2,5,20,100,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Join",IDOK,129,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
+    LTEXT           "Game &Number:",IDC_STATIC,5,7,48,8
+END
+
+IDD_DIALOG3 DIALOG DISCARDABLE  0, 0, 237, 201
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Host Game"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "IPAddress3",IDC_IPADDRESS1,"SysIPAddress32",WS_TABSTOP,
+                    108,35,61,14
+    COMBOBOX        IDC_COMBO1,5,90,110,105,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Detect &Internet Address",IDC_BUTTON1,120,90,110,14
+    PUSHBUTTON      "Detect &LAN Address",IDC_BUTTON3,63,140,110,14
+    DEFPUSHBUTTON   "&Host",IDOK,5,180,110,14
+    PUSHBUTTON      "Cancel",IDCANCEL,120,180,110,14
+    LTEXT           "IP &Address:",IDC_STATIC,68,38,40,10
+    LTEXT           "To host a game, enter your IP address in the box below and press the Host button. If you do not know your IP address, try one of the options below.",
+                    IDC_STATIC,5,5,225,25
+    LTEXT           "If you are playing a game over the internet, pick a detection site from the list below and press the Detect Internet Address button.",
+                    IDC_STATIC,5,65,225,20
+    LTEXT           "If you are playing a game over a network, press the Detect LAN Address button.",
+                    IDC_STATIC,5,120,225,15
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,5,165,
+                    225,1
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 330
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 184
+    END
+
+    IDD_DIALOG2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 39
+    END
+
+    IDD_DIALOG3, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 230
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 194
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON    DISCARDABLE     "icon1.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// WIZ
+//
+
+IDR_WIZ1                WIZ     DISCARDABLE     "Template.wiz"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// TXT
+//
+
+IDR_TXT1                TXT     DISCARDABLE     "README.TXT"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// THM
+//
+
+IDR_THM1                THM     DISCARDABLE     "Template.thm"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
