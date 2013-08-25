@@ -1,4 +1,5 @@
 *.exe
 *.o
 *.ini
+*.swp
 MC_README.TXT
