@@ -51,7 +51,7 @@
 
 
 #include "stdafx.h"
-#include <atlbase.h>
+//#include <atlbase.h>
 #include <commctrl.h>
 #include <time.h>
 #include <wininet.h>
@@ -88,10 +88,13 @@ DWORD dwIPAddressG = NULL;
 
 BOOL GetMoonbaseCommanderPath (void)
    {
-   CRegKey rk;
-   if (rk.Open(HKEY_LOCAL_MACHINE, "SOFTWARE\\Humongous Entertainment\\Moonbase\\Path") == ERROR_SUCCESS)
+   HKEY hMBCKey;
+//   CRegKey rk;
+   if (RegOpenKeyEx(HKEY_CURRENT_USER,"SOFTWARE\\Humongous Entertainment\\Moonbase\\Path",0,KEY_READ,&hMBCKey) == ERROR_SUCCESS)
+//   if (rk.Open(HKEY_LOCAL_MACHINE, "SOFTWARE\\Humongous Entertainment\\Moonbase\\Path") == ERROR_SUCCESS)
       {
       DWORD csz = sizeof(szMoonbasePathG);
+	  RegGetValue(hMBCKey,"SOFTWARE\\Humongous Entertainment\\Moonbase\\Path",csz,KEY_READ,
       rk.QueryValue(szMoonbasePathG, "", &csz);
       }
    else
