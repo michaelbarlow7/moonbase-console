@@ -17,8 +17,13 @@ Thanks Jason Creighton for posting this information on your [blog post](http://j
 The following is taken from the "About" dialog within the application.
 
 > A lot of people helped in one way or the other. Here are the main contributors (in alphabetical order)
+
 > Katton designed and coded the Katton map generation algorithm. He decoded a lot of the tiles and published what he learned. He also coded the algorithm that puts the "craters" on the map and wrote the code that generates the map preview showing the options.
+
 > MYCROFT wrote the tools to rip apart the MAP files so they could be deciphered, decoded the rest of the tiles, defined the format that allows the generators to describe the map without caring about tiles, wrote the code to translate the generator output to a useable map, and did the Windows coding.
+
 > SpacemanSpiff designed and coded the Spiff map generation algorithm. He also contributed to deciphering the map file format.
+
 > Special thanks to Bwappo for his contest-winning thumbnail image.
+
 > A number of other people on the Moonbase Commander forums also contributed to map decoding or beta testing including Bwappo, Covak, florent28, Kamolas, llangford, and YorkdinK.
