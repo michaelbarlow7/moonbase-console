@@ -65,6 +65,7 @@
 #include "KattonGen.h"
 #include "GameInfo.h"
 #include <stdlib.h>
+#include <ctype.h>
 
 
 
