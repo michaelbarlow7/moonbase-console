@@ -1,0 +1,8 @@
+HOW TO BUILD
+Originally, this project was built using an old version of Microsoft Visual Studio. Since this relied on deprecated libraries and caused a bunch of strife to build again, I made a Makefile to make it easy to compile using MinGW. This should be relatively future-proof.
+
+To build Moonbase Console, you'll need to install MinGW, with the C++ compiler. Navigate to the root directory and type "make".
+
+Currently, you'll need to place the .exe file in the same directory as Moonbase Commander to get it working properly, and you'll probably need to run it as Administrator.
+
+I've left the original Visual Studio project files there for convenience sake.
