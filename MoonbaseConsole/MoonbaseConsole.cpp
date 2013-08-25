@@ -51,7 +51,7 @@
 
 
 #include "stdafx.h"
-#include <atlbase.h>
+//#include <atlbase.h>
 #include <commctrl.h>
 #include <time.h>
 #include <wininet.h>
@@ -64,6 +64,7 @@
 #include "SpiffGen.h"
 #include "KattonGen.h"
 #include "GameInfo.h"
+#include <stdlib.h>
 
 
 
@@ -88,13 +89,13 @@ DWORD dwIPAddressG = NULL;
 
 BOOL GetMoonbaseCommanderPath (void)
    {
-   CRegKey rk;
+   /*CRegKey rk;
    if (rk.Open(HKEY_LOCAL_MACHINE, "SOFTWARE\\Humongous Entertainment\\Moonbase\\Path") == ERROR_SUCCESS)
       {
       DWORD csz = sizeof(szMoonbasePathG);
       rk.QueryValue(szMoonbasePathG, "", &csz);
       }
-   else
+   else*/
       {
       // Failed to find the registry key, try HEGAMES.INI
 
@@ -106,8 +107,15 @@ BOOL GetMoonbaseCommanderPath (void)
       GetPrivateProfileString("Moonbase", "GameResourcePath", "", szMoonbasePathG, MAX_PATH, szPath);
       }
 
+
    strcpy(szMoonbaseIniFileG, szMoonbasePathG);
    strcat(szMoonbaseIniFileG, "moonbase.ini");
+	//    I had issues finding the path using the above code, probably because I don't
+   // have atlbase.h to look at the registry. I had to use the hacks below to get it to run.
+   // Hopefully moving to MinGW might fix this. 
+   // It works if you put it in the Moonbase Commander directory though
+	   //strcpy(szMoonbasePathG, "C:\\GOG Games\\Moonbase Commander\\");
+	   //strcpy(szMoonbaseIniFileG, "C:\\GOG Games\\Moonbase Commander\\Moonbase.ini");
 
    return TRUE;
    }

@@ -319,7 +319,7 @@ int distance (int x1, int y1, int x2, int y2) {
 	int dx, dy, disp;
 	dx = min ((abs (x1 - x2)), (abs (x1+size - x2)), (abs (x2+size - x1)));
 	dy = min ((abs (y1 - y2)), (abs (y1+size - y2)), (abs (y2+size - y1)));
-	disp = (int) sqrt( dx * dx + dy * dy );
+	disp = (int) sqrt((double) (dx * dx + dy * dy ));
 	return disp;
 }
 

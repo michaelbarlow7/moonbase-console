@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <iostream.h>
+#include <iostream>
 #include "..\Common\mbcmif.h"
 #include "GameInfo.h"
 
