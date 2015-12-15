@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <iostream>
-#include "..\Common\mbcmif.h"
+#include "mbcmif.h"
 #include "GameInfo.h"
 
 #define MAXELEVVAL 4 //for array size
