@@ -698,12 +698,11 @@ BOOL CALLBACK HostDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPar
       case WM_INITDIALOG:
          {
          HWND hwndCtl = GetDlgItem(hwndDlg, IDC_COMBO1);
-         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://simple.showmyip.com");
-         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://www.whatismyip.com");
          SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://checkip.dyndns.org");
+         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://api.ipify.org");
 
          char sz[1024];
-         GetPrivateProfileString("MoonbaseConsole", "IPService", "http://simple.showmyip.com", sz, sizeof(sz), szMoonbaseIniFileG);
+         GetPrivateProfileString("MoonbaseConsole", "IPService", "http://api.ipify.org", sz, sizeof(sz), szMoonbaseIniFileG);
          SendMessage(hwndCtl, WM_SETTEXT, NULL, (LPARAM)sz);
 
          int nValue;
