@@ -113,7 +113,7 @@ CAPTION "Host Game"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "IPAddress3",IDC_IPADDRESS1,"SysIPAddress32",WS_TABSTOP,
-                    108,35,61,14
+                    108,35,81,14
     COMBOBOX        IDC_COMBO1,5,90,110,105,CBS_DROPDOWN | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Detect &Internet Address",IDC_BUTTON1,120,90,110,14
