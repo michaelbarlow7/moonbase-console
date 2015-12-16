@@ -28,7 +28,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-IDD_DIALOG1 DIALOG DISCARDABLE  0, 0, 337, 191
+IDD_DIALOG1 DIALOG DISCARDABLE  0, 0, 337, 223
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Moonbase Console v2.1.26"
 FONT 8, "MS Sans Serif"
@@ -92,8 +92,10 @@ BEGIN
     LTEXT           "Emerau Glyph",IDC_STATIC,131,61,29,20
     LTEXT           "Ablation Laund",IDC_STATIC,131,43,30,16
     LTEXT           "Algorithm",IDC_STATIC,10,35,30,8
-    PUSHBUTTON      "H&elp",IDC_BUTTON1,5,170,160,14
-    PUSHBUTTON      "&Credits",IDC_BUTTON3,170,170,160,14
+    GROUPBOX        "Game Options",IDC_STATIC,5,170,325,29
+    PUSHBUTTON      "Se&ttings",IDC_BUTTON4,10,180,155,14
+    PUSHBUTTON      "H&elp",IDC_BUTTON1,5,204,160,14
+    PUSHBUTTON      "&Credits",IDC_BUTTON3,170,204,160,14
 END
 
 IDD_DIALOG2 DIALOG DISCARDABLE  0, 0, 186, 46
@@ -131,6 +133,59 @@ BEGIN
                     225,1
 END
 
+IDD_DIALOG4 DIALOG DISCARDABLE  0, 0, 280, 200
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Game Options"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Player Name",IDC_STATIC,5,5,110,39
+    CTEXT           "COMMANDER",IDC_TXT1,10,15,100,10
+    PUSHBUTTON      "&Change",IDC_BUTTON1,60,25,50,14
+    GROUPBOX        "Controls",IDC_STATIC,5,49,110,130
+    LTEXT           "Damage Bar",IDC_STATIC,10,59,80,10
+    PUSHBUTTON      "D",IDC_BUTTON2,65,57,45,12
+    LTEXT           "Range Radius",IDC_STATIC,10,74,80,10
+    PUSHBUTTON      "R",IDC_BUTTON3,65,72,45,12
+    LTEXT           "Center Unit",IDC_STATIC,10,89,80,10
+    PUSHBUTTON      "C",IDC_BUTTON4,65,86,45,12
+    LTEXT           "Next Unit",IDC_STATIC,10,104,80,10
+    PUSHBUTTON      "N",IDC_BUTTON5,65,101,45,12
+    LTEXT           "Previous Unit",IDC_STATIC,10,119,80,10
+    PUSHBUTTON      "P",IDC_BUTTON6,65,116,45,12
+    LTEXT           "Closest Launcher",IDC_STATIC,10,134,80,10
+    PUSHBUTTON      "L",IDC_BUTTON7,65,131,45,12
+    LTEXT           "Show Attacked",IDC_STATIC,10,149,80,10
+    PUSHBUTTON      "A",IDC_BUTTON8,65,146,45,12
+    LTEXT           "Chat Toggle",IDC_STATIC,10,164,80,10
+    PUSHBUTTON      "TAB",IDC_BUTTON9,65,161,45,12
+    GROUPBOX        "Preferences",IDC_STATIC,120,5,155,70
+    CONTROL         "Auto Scroll",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,125,15,80,10
+    CONTROL         "Auto Hub Select",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,125,30,80,10
+    CONTROL         "Smart Camera",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,125,45,80,10
+    CONTROL         "Auto Return Camera",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,125,60,80,10
+    GROUPBOX        "Audio",IDC_STATIC,120,80,155,99
+    LTEXT           "SFX vol.",IDC_STATIC,125,90,80,10
+    CONTROL         "Slider1",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    WS_TABSTOP,160,90,110,20
+    LTEXT           "Music vol.",IDC_STATIC,125,110,80,10
+    CONTROL         "Slider1",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    WS_TABSTOP,160,110,110,20
+    LTEXT           "Voice vol.",IDC_STATIC,125,130,80,10
+    CONTROL         "Slider1",IDC_SLIDER3,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    WS_TABSTOP,160,130,110,20
+    CONTROL         "Commentary",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,125,150,100,10
+    LTEXT           "Music Quality",IDC_STATIC,125,165,80,10
+    CONTROL         "Low",IDR_BUTTON1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,180,165,40,10
+    CONTROL         "High",IDR_BUTTON2,"Button", BS_AUTORADIOBUTTON,220,165,40,10
+    PUSHBUTTON      "&Reset",IDC_BUTTON10,5,184,85,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,95,184,85,14
+    PUSHBUTTON      "&OK",IDC_BUTTON11,185,184,85,14
+END
 
 /////////////////////////////////////////////////////////////////////////////
 //

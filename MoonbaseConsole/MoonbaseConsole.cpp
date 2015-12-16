@@ -899,6 +899,15 @@ BOOL CALLBACK DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
                                    "Moonbase Console Credits",
                                    MB_OK);
                return TRUE;
+
+            case IDC_BUTTON4: //Settings
+               {
+                   if (!DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG4), hwndDlg, HostDlgProc, 0))
+                       return TRUE; // bail if they cancel
+                   //MessageBox(hwndDlg, "Settings go here", "Settings", MB_OK);
+                   //return true;
+               }
+
             
             case IDC_BTN_HOST_GAME:
                if (!DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG3), hwndDlg, HostDlgProc, 0))
