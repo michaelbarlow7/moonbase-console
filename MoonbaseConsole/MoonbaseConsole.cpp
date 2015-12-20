@@ -68,12 +68,53 @@
 #include <ctype.h>
 
 
-
 // 1.0.15 == 4 (public release)
 // 2.0.16 == 5 (leaked release)
 // 2.1    == 6 (public release)
 #define GAMENUM_VERSION 6
 
+// ini keys
+#define INI_KEY_NAME                        "name"
+#define INI_KEY_DAMAGE_BAR                  "0-0"
+#define INI_KEY_RANGE_RADIUS                "0-1"
+#define INI_KEY_CENTER_UNIT                 "0-2"
+#define INI_KEY_NEXT_UNIT                   "0-3"
+#define INI_KEY_PREVIOUS_UNIT               "0-4"
+#define INI_KEY_CLOSEST_LAUNCHER            "0-5"
+#define INI_KEY_SHOW_ATTACKED               "0-6"
+#define INI_KEY_CHAT_TOGGLE                 "0-7"
+#define INI_KEY_AUTO_SCROLL                 "0-8"
+#define INI_KEY_AUTO_HUB_SELECT             "0-9"
+#define INI_KEY_SMART_CAMERA                "0-10"
+#define INI_KEY_AUTO_RETURN_CAMERA          "0-11"
+#define INI_KEY_SFX_VOLUME                  "0-12"
+#define INI_KEY_MUSIC_VOLUME                "0-13"
+#define INI_KEY_VOICE_VOLUME                "0-14"
+#define INI_KEY_INTERFACE_VOLUME            "0-15"
+#define INI_KEY_MUSIC_QUALITY               "0-16"
+#define INI_KEY_COMMENTARY                  "0-17"
+
+// Default game options
+// TODO: Might put all defaults here for neatness' sake
+#define DEFAULT_PLAYER_NAME                 "Commander"
+#define DEFAULT_CONTROL_DAMAGE_BAR          100
+#define DEFAULT_CONTROL_RANGE_RADIUS        114
+#define DEFAULT_CONTROL_CENTER_UNIT         99
+#define DEFAULT_CONTROL_NEXT_UNIT           110
+#define DEFAULT_CONTROL_PREVIOUS_UNIT       112
+#define DEFAULT_CONTROL_CLOSEST_LAUNCHER    108
+#define DEFAULT_CONTROL_SHOW_ATTACKED       97
+#define DEFAULT_CONTROL_CHAT_TOGGLE         9
+#define DEFAULT_CONTROL_AUTO_SCROLL         FALSE
+#define DEFAULT_CONTROL_AUTO_HUB_SELECT     FALSE
+#define DEFAULT_CONTROL_SMART_CAMERA        FALSE
+#define DEFAULT_CONTROL_AUTO_RETURN_CAMERA  FALSE
+#define DEFAULT_CONTROL_SFX_VOLUME          255
+#define DEFAULT_CONTROL_MUSIC_VOLUME        96
+#define DEFAULT_CONTROL_VOICE_VOLUME        196
+#define DEFAULT_CONTROL_INTERFACE_VOLUME    196
+#define DEFAULT_CONTROL_MUSIC_QUALITY       TRUE
+#define DEFAULT_CONTROL_COMMENTARY          TRUE
 
 
 char szMoonbasePathG[MAX_PATH];
@@ -86,6 +127,27 @@ int nReplayNumberHighestG;
 CGameInfo giG;
 DWORD dwIPAddressG = NULL;
 
+// Game settings variables
+int damageBarPreference;
+int rangeRadiusPreference;
+int centerUnitPreference;
+int nextUnitPreference;
+int previousUnitPreference;
+int closestLauncherPreference;
+int showAttackedPreference;
+int chatTogglePreference;
+
+BOOL autoScrollPreference;
+BOOL autoHubSelectPreference;
+BOOL smartCameraPreference;
+BOOL autoReturnCameraPreference;
+
+int sfxVolumePreference;
+int musicVolumePreference;
+int voiceVolumePreference;
+int interfaceVolumePreference;
+BOOL commentaryPreference;
+BOOL musicQualityPreference;
 
 
 BOOL GetMoonbaseCommanderPath (void)
@@ -320,6 +382,7 @@ void EnableDialog (HWND hwnd, bool bEnable)
    EnableWindow(GetDlgItem(hwnd, IDC_BUTTON1), bEnable);
    EnableWindow(GetDlgItem(hwnd, IDC_BUTTON2), bEnable);
    EnableWindow(GetDlgItem(hwnd, IDC_BUTTON3), bEnable);
+   EnableWindow(GetDlgItem(hwnd, IDC_BUTTON4), bEnable);
    EnableWindow(GetDlgItem(hwnd, IDC_SINGLE_GENERATE), bEnable);
 
    EnableWindow(GetDlgItem(hwnd, IDC_SLIDER1), bEnable);
@@ -612,7 +675,127 @@ DWORD DetectLANIPAddress (void)
    return dwRet;
    }
 
+const char * getKeyStringFromInt(int key) {
+    if (key == 32){
+        return "SPC";
+    }
+    if (key == 10){
+        return "BK";
+    }
+    if (key == 13){
+        return "ENT";
+    }
+    if (key == 9){
+        return "TAB";
+    }
+    return NULL;
 
+}
+
+BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch(message){
+        case WM_INITDIALOG:
+            {
+                // Initialise with settings from file
+                char name[10]; // Name can only be 10 characters long
+                GetPrivateProfileString("Options", INI_KEY_NAME, DEFAULT_PLAYER_NAME, name, sizeof(name), szMoonbaseIniFileG);
+                SendMessage(GetDlgItem(hwndDlg, IDC_TXT1), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
+
+                const char * keyString;
+                // Damage bar preference:
+                damageBarPreference = GetPrivateProfileInt("Options", INI_KEY_DAMAGE_BAR, DEFAULT_CONTROL_DAMAGE_BAR, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(damageBarPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON2), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &damageBarPreference : (LPARAM) keyString));
+
+                // Range radius
+                rangeRadiusPreference = GetPrivateProfileInt("Options", INI_KEY_RANGE_RADIUS, DEFAULT_CONTROL_RANGE_RADIUS, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(rangeRadiusPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON3), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &rangeRadiusPreference : (LPARAM) keyString));
+
+                // Center unit
+                centerUnitPreference = GetPrivateProfileInt("Options", INI_KEY_CENTER_UNIT, DEFAULT_CONTROL_CENTER_UNIT, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(centerUnitPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON4), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &centerUnitPreference : (LPARAM) keyString));
+
+                // Next unit
+                nextUnitPreference = GetPrivateProfileInt("Options", INI_KEY_NEXT_UNIT, DEFAULT_CONTROL_NEXT_UNIT, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(nextUnitPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON5), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &nextUnitPreference : (LPARAM) keyString));
+
+                // Previous unit
+                previousUnitPreference = GetPrivateProfileInt("Options", INI_KEY_PREVIOUS_UNIT, DEFAULT_CONTROL_PREVIOUS_UNIT, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(previousUnitPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON6), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &previousUnitPreference : (LPARAM) keyString));
+
+                // Closest launcher
+                closestLauncherPreference = GetPrivateProfileInt("Options", INI_KEY_CLOSEST_LAUNCHER, DEFAULT_CONTROL_CLOSEST_LAUNCHER, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(closestLauncherPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON7), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &closestLauncherPreference : (LPARAM) keyString));
+
+                // Show attacked
+                showAttackedPreference = GetPrivateProfileInt("Options", INI_KEY_SHOW_ATTACKED, DEFAULT_CONTROL_SHOW_ATTACKED, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(showAttackedPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON8), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &showAttackedPreference : (LPARAM) keyString));
+
+                // Chat toggle
+                chatTogglePreference = GetPrivateProfileInt("Options", INI_KEY_CHAT_TOGGLE, DEFAULT_CONTROL_CHAT_TOGGLE, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(chatTogglePreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON9), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &chatTogglePreference : (LPARAM) keyString));
+
+                // Auto scroll
+                autoScrollPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_SCROLL, DEFAULT_CONTROL_AUTO_SCROLL, szMoonbaseIniFileG);
+                CheckDlgButton(hwndDlg, IDC_CHECK1, autoScrollPreference);
+
+                // Auto hub select
+                autoHubSelectPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_HUB_SELECT, DEFAULT_CONTROL_AUTO_HUB_SELECT, szMoonbaseIniFileG);
+                CheckDlgButton(hwndDlg, IDC_CHECK2, autoHubSelectPreference);
+
+                // Smart camera
+                smartCameraPreference = GetPrivateProfileInt("Options", INI_KEY_SMART_CAMERA, DEFAULT_CONTROL_SMART_CAMERA, szMoonbaseIniFileG);
+                CheckDlgButton(hwndDlg, IDC_CHECK3, smartCameraPreference);
+
+                // Auto return camera
+                autoReturnCameraPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_RETURN_CAMERA, DEFAULT_CONTROL_AUTO_RETURN_CAMERA, szMoonbaseIniFileG);
+                CheckDlgButton(hwndDlg, IDC_CHECK4, smartCameraPreference);
+
+                // SFX volume
+                sfxVolumePreference = GetPrivateProfileInt("Options", INI_KEY_SFX_VOLUME, DEFAULT_CONTROL_SFX_VOLUME, szMoonbaseIniFileG);
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER1), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER1), TBM_SETPOS, TRUE, sfxVolumePreference);  
+
+                // Music volume
+                musicVolumePreference = GetPrivateProfileInt("Options", INI_KEY_MUSIC_VOLUME, DEFAULT_CONTROL_MUSIC_VOLUME, szMoonbaseIniFileG);
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER2), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER2), TBM_SETPOS, TRUE, musicVolumePreference);  
+
+                // Voice volume
+                voiceVolumePreference = GetPrivateProfileInt("Options", INI_KEY_VOICE_VOLUME, DEFAULT_CONTROL_VOICE_VOLUME, szMoonbaseIniFileG);
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER3), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER3), TBM_SETPOS, TRUE, voiceVolumePreference);  
+
+                // Interface volume
+                interfaceVolumePreference = GetPrivateProfileInt("Options", INI_KEY_INTERFACE_VOLUME, DEFAULT_CONTROL_INTERFACE_VOLUME, szMoonbaseIniFileG);
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER4), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER4), TBM_SETPOS, TRUE, interfaceVolumePreference);  
+
+                // Commentary
+                commentaryPreference = GetPrivateProfileInt("Options", INI_KEY_COMMENTARY, DEFAULT_CONTROL_COMMENTARY, szMoonbaseIniFileG);
+                CheckDlgButton(hwndDlg, IDC_CHECK5, commentaryPreference);
+
+                // Music quality (FALSE == low, TRUE == high)
+                musicQualityPreference = GetPrivateProfileInt("Options", INI_KEY_MUSIC_QUALITY, DEFAULT_CONTROL_MUSIC_QUALITY, szMoonbaseIniFileG);
+                CheckRadioButton(hwndDlg, IDR_BUTTON1, IDR_BUTTON2, musicQualityPreference ? IDR_BUTTON2 : IDR_BUTTON1);
+
+                return TRUE;
+            }
+        case WM_COMMAND:
+            {
+                // Act on commands
+                return TRUE;
+            }
+    }
+    return FALSE;
+}
 
 BOOL CALLBACK JoinDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
    { 
@@ -902,10 +1085,8 @@ BOOL CALLBACK DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
             case IDC_BUTTON4: //Settings
                {
-                   if (!DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG4), hwndDlg, HostDlgProc, 0))
+                   if (!DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG4), hwndDlg, GameOptionsDlgProc, 0))
                        return TRUE; // bail if they cancel
-                   //MessageBox(hwndDlg, "Settings go here", "Settings", MB_OK);
-                   //return true;
                }
 
             
