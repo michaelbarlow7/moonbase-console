@@ -779,9 +779,65 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
             {
                 switch(LOWORD(wParam))
                 {
-                    case IDC_BUTTON10:
+                    case IDC_BUTTON10: 
                         {
-                            //TODO: Reset all fields to defaults
+                            // Reset
+                            strncpy(name, DEFAULT_PLAYER_NAME, 10);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_TXT1), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
+
+                            const char * keyString;
+
+                            damageBarPreference =  DEFAULT_CONTROL_DAMAGE_BAR;
+                            keyString = getKeyStringFromInt(damageBarPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON2), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &damageBarPreference : (LPARAM) keyString));
+
+                            rangeRadiusPreference =  DEFAULT_CONTROL_RANGE_RADIUS;
+                            keyString = getKeyStringFromInt(rangeRadiusPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON3), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &rangeRadiusPreference : (LPARAM) keyString));
+
+                            centerUnitPreference =  DEFAULT_CONTROL_CENTER_UNIT;
+                            keyString = getKeyStringFromInt(centerUnitPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON4), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &centerUnitPreference : (LPARAM) keyString));
+
+                            nextUnitPreference = DEFAULT_CONTROL_NEXT_UNIT;
+                            keyString = getKeyStringFromInt(nextUnitPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON5), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &nextUnitPreference : (LPARAM) keyString));
+
+                            previousUnitPreference = DEFAULT_CONTROL_PREVIOUS_UNIT;
+                            keyString = getKeyStringFromInt(previousUnitPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON6), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &previousUnitPreference : (LPARAM) keyString));
+                            
+                            closestLauncherPreference = DEFAULT_CONTROL_CLOSEST_LAUNCHER;
+                            keyString = getKeyStringFromInt(closestLauncherPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON7), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &closestLauncherPreference : (LPARAM) keyString));
+
+                            showAttackedPreference = DEFAULT_CONTROL_SHOW_ATTACKED;
+                            keyString = getKeyStringFromInt(showAttackedPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON8), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &showAttackedPreference : (LPARAM) keyString));
+                            
+                            chatTogglePreference = DEFAULT_CONTROL_CHAT_TOGGLE;
+                            keyString = getKeyStringFromInt(chatTogglePreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON9), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &chatTogglePreference : (LPARAM) keyString));
+
+                            CheckDlgButton(hwndDlg, IDC_CHECK1, DEFAULT_CONTROL_AUTO_SCROLL);
+
+                            CheckDlgButton(hwndDlg, IDC_CHECK2, DEFAULT_CONTROL_AUTO_HUB_SELECT);
+
+                            CheckDlgButton(hwndDlg, IDC_CHECK3, DEFAULT_CONTROL_SMART_CAMERA);
+
+                            CheckDlgButton(hwndDlg, IDC_CHECK4, DEFAULT_CONTROL_AUTO_RETURN_CAMERA);
+
+                            SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER1), TBM_SETPOS, TRUE, DEFAULT_CONTROL_SFX_VOLUME);  
+                            
+                            SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER2), TBM_SETPOS, TRUE, DEFAULT_CONTROL_MUSIC_VOLUME);  
+                            
+                            SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER3), TBM_SETPOS, TRUE, DEFAULT_CONTROL_VOICE_VOLUME);  
+                            
+                            SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER4), TBM_SETPOS, TRUE, DEFAULT_CONTROL_INTERFACE_VOLUME);  
+
+                            CheckDlgButton(hwndDlg, IDC_CHECK5, DEFAULT_CONTROL_COMMENTARY);
+
+                            CheckRadioButton(hwndDlg, IDR_BUTTON1, IDR_BUTTON2, DEFAULT_CONTROL_MUSIC_QUALITY ? IDR_BUTTON1 : IDR_BUTTON2);
                             break;
                         }
                     case IDOK:
