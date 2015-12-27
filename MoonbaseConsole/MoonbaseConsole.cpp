@@ -743,7 +743,7 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 
                 // Auto return camera
                 BOOL autoReturnCameraPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_RETURN_CAMERA, DEFAULT_CONTROL_AUTO_RETURN_CAMERA, szMoonbaseIniFileG);
-                CheckDlgButton(hwndDlg, IDC_CHECK4, smartCameraPreference);
+                CheckDlgButton(hwndDlg, IDC_CHECK4, autoReturnCameraPreference);
 
                 // SFX volume
                 int sfxVolumePreference = GetPrivateProfileInt("Options", INI_KEY_SFX_VOLUME, DEFAULT_CONTROL_SFX_VOLUME, szMoonbaseIniFileG);
