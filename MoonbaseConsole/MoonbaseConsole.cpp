@@ -113,7 +113,7 @@
 #define DEFAULT_CONTROL_MUSIC_VOLUME        96
 #define DEFAULT_CONTROL_VOICE_VOLUME        196
 #define DEFAULT_CONTROL_INTERFACE_VOLUME    196
-#define DEFAULT_CONTROL_MUSIC_QUALITY       TRUE
+#define DEFAULT_CONTROL_MUSIC_QUALITY       FALSE
 #define DEFAULT_CONTROL_COMMENTARY          TRUE
 
 
@@ -128,6 +128,7 @@ CGameInfo giG;
 DWORD dwIPAddressG = NULL;
 
 // Game settings variables
+char name[10];
 int damageBarPreference;
 int rangeRadiusPreference;
 int centerUnitPreference;
@@ -136,19 +137,6 @@ int previousUnitPreference;
 int closestLauncherPreference;
 int showAttackedPreference;
 int chatTogglePreference;
-
-BOOL autoScrollPreference;
-BOOL autoHubSelectPreference;
-BOOL smartCameraPreference;
-BOOL autoReturnCameraPreference;
-
-int sfxVolumePreference;
-int musicVolumePreference;
-int voiceVolumePreference;
-int interfaceVolumePreference;
-BOOL commentaryPreference;
-BOOL musicQualityPreference;
-
 
 BOOL GetMoonbaseCommanderPath (void)
    {
@@ -696,8 +684,7 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
     switch(message){
         case WM_INITDIALOG:
             {
-                // Initialise with settings from file
-                char name[10]; // Name can only be 10 characters long
+                // Name can only be 10 characters long
                 GetPrivateProfileString("Options", INI_KEY_NAME, DEFAULT_PLAYER_NAME, name, sizeof(name), szMoonbaseIniFileG);
                 SendMessage(GetDlgItem(hwndDlg, IDC_TXT1), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
 
@@ -743,53 +730,147 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
                 SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON9), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &chatTogglePreference : (LPARAM) keyString));
 
                 // Auto scroll
-                autoScrollPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_SCROLL, DEFAULT_CONTROL_AUTO_SCROLL, szMoonbaseIniFileG);
+                BOOL autoScrollPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_SCROLL, DEFAULT_CONTROL_AUTO_SCROLL, szMoonbaseIniFileG);
                 CheckDlgButton(hwndDlg, IDC_CHECK1, autoScrollPreference);
 
                 // Auto hub select
-                autoHubSelectPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_HUB_SELECT, DEFAULT_CONTROL_AUTO_HUB_SELECT, szMoonbaseIniFileG);
+                BOOL autoHubSelectPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_HUB_SELECT, DEFAULT_CONTROL_AUTO_HUB_SELECT, szMoonbaseIniFileG);
                 CheckDlgButton(hwndDlg, IDC_CHECK2, autoHubSelectPreference);
 
                 // Smart camera
-                smartCameraPreference = GetPrivateProfileInt("Options", INI_KEY_SMART_CAMERA, DEFAULT_CONTROL_SMART_CAMERA, szMoonbaseIniFileG);
+                BOOL smartCameraPreference = GetPrivateProfileInt("Options", INI_KEY_SMART_CAMERA, DEFAULT_CONTROL_SMART_CAMERA, szMoonbaseIniFileG);
                 CheckDlgButton(hwndDlg, IDC_CHECK3, smartCameraPreference);
 
                 // Auto return camera
-                autoReturnCameraPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_RETURN_CAMERA, DEFAULT_CONTROL_AUTO_RETURN_CAMERA, szMoonbaseIniFileG);
+                BOOL autoReturnCameraPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_RETURN_CAMERA, DEFAULT_CONTROL_AUTO_RETURN_CAMERA, szMoonbaseIniFileG);
                 CheckDlgButton(hwndDlg, IDC_CHECK4, smartCameraPreference);
 
                 // SFX volume
-                sfxVolumePreference = GetPrivateProfileInt("Options", INI_KEY_SFX_VOLUME, DEFAULT_CONTROL_SFX_VOLUME, szMoonbaseIniFileG);
+                int sfxVolumePreference = GetPrivateProfileInt("Options", INI_KEY_SFX_VOLUME, DEFAULT_CONTROL_SFX_VOLUME, szMoonbaseIniFileG);
                 SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER1), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
                 SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER1), TBM_SETPOS, TRUE, sfxVolumePreference);  
 
                 // Music volume
-                musicVolumePreference = GetPrivateProfileInt("Options", INI_KEY_MUSIC_VOLUME, DEFAULT_CONTROL_MUSIC_VOLUME, szMoonbaseIniFileG);
+                int musicVolumePreference = GetPrivateProfileInt("Options", INI_KEY_MUSIC_VOLUME, DEFAULT_CONTROL_MUSIC_VOLUME, szMoonbaseIniFileG);
                 SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER2), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
                 SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER2), TBM_SETPOS, TRUE, musicVolumePreference);  
 
                 // Voice volume
-                voiceVolumePreference = GetPrivateProfileInt("Options", INI_KEY_VOICE_VOLUME, DEFAULT_CONTROL_VOICE_VOLUME, szMoonbaseIniFileG);
+                int voiceVolumePreference = GetPrivateProfileInt("Options", INI_KEY_VOICE_VOLUME, DEFAULT_CONTROL_VOICE_VOLUME, szMoonbaseIniFileG);
                 SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER3), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
                 SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER3), TBM_SETPOS, TRUE, voiceVolumePreference);  
 
                 // Interface volume
-                interfaceVolumePreference = GetPrivateProfileInt("Options", INI_KEY_INTERFACE_VOLUME, DEFAULT_CONTROL_INTERFACE_VOLUME, szMoonbaseIniFileG);
+                int interfaceVolumePreference = GetPrivateProfileInt("Options", INI_KEY_INTERFACE_VOLUME, DEFAULT_CONTROL_INTERFACE_VOLUME, szMoonbaseIniFileG);
                 SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER4), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
                 SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER4), TBM_SETPOS, TRUE, interfaceVolumePreference);  
 
                 // Commentary
-                commentaryPreference = GetPrivateProfileInt("Options", INI_KEY_COMMENTARY, DEFAULT_CONTROL_COMMENTARY, szMoonbaseIniFileG);
+                BOOL commentaryPreference = GetPrivateProfileInt("Options", INI_KEY_COMMENTARY, DEFAULT_CONTROL_COMMENTARY, szMoonbaseIniFileG);
                 CheckDlgButton(hwndDlg, IDC_CHECK5, commentaryPreference);
 
-                // Music quality (FALSE == low, TRUE == high)
-                musicQualityPreference = GetPrivateProfileInt("Options", INI_KEY_MUSIC_QUALITY, DEFAULT_CONTROL_MUSIC_QUALITY, szMoonbaseIniFileG);
-                CheckRadioButton(hwndDlg, IDR_BUTTON1, IDR_BUTTON2, musicQualityPreference ? IDR_BUTTON2 : IDR_BUTTON1);
+                // Music quality (FALSE == high, TRUE == low)
+                BOOL musicQualityPreference = GetPrivateProfileInt("Options", INI_KEY_MUSIC_QUALITY, DEFAULT_CONTROL_MUSIC_QUALITY, szMoonbaseIniFileG);
+                CheckRadioButton(hwndDlg, IDR_BUTTON1, IDR_BUTTON2, musicQualityPreference ? IDR_BUTTON1 : IDR_BUTTON2);
 
                 return TRUE;
             }
         case WM_COMMAND:
             {
+                switch(LOWORD(wParam))
+                {
+                    case IDC_BUTTON10:
+                        {
+                            //TODO: Reset all fields to defaults
+                            break;
+                        }
+                    case IDOK:
+                        {
+                            WritePrivateProfileString("user", INI_KEY_NAME, name, szMoonbaseIniFileG);
+
+                            char sz[4];
+
+                            // Damage bar
+                            wsprintf(sz, "%d", damageBarPreference);
+                            WritePrivateProfileString("Options", INI_KEY_DAMAGE_BAR, sz, szMoonbaseIniFileG);
+
+                            // Range radius
+                            wsprintf(sz, "%d", rangeRadiusPreference);
+                            WritePrivateProfileString("Options", INI_KEY_RANGE_RADIUS, sz, szMoonbaseIniFileG);
+
+                            // Center unit
+                            wsprintf(sz, "%d", centerUnitPreference);
+                            WritePrivateProfileString("Options", INI_KEY_CENTER_UNIT, sz, szMoonbaseIniFileG);
+
+                            // Next unit
+                            wsprintf(sz, "%d", nextUnitPreference);
+                            WritePrivateProfileString("Options", INI_KEY_NEXT_UNIT, sz, szMoonbaseIniFileG);
+
+                            // Previous unit
+                            wsprintf(sz, "%d", previousUnitPreference);
+                            WritePrivateProfileString("Options", INI_KEY_PREVIOUS_UNIT, sz, szMoonbaseIniFileG);
+
+                            // Closest launcher
+                            wsprintf(sz, "%d", closestLauncherPreference);
+                            WritePrivateProfileString("Options", INI_KEY_CLOSEST_LAUNCHER, sz, szMoonbaseIniFileG);
+
+                            // Show attacked
+                            wsprintf(sz, "%d", showAttackedPreference);
+                            WritePrivateProfileString("Options", INI_KEY_SHOW_ATTACKED, sz, szMoonbaseIniFileG);
+
+                            // Chat toggle
+                            wsprintf(sz, "%d", chatTogglePreference);
+                            WritePrivateProfileString("Options", INI_KEY_CHAT_TOGGLE, sz, szMoonbaseIniFileG);
+
+                            // Auto scroll
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDC_CHECK1));
+                            WritePrivateProfileString("Options", INI_KEY_AUTO_SCROLL, sz, szMoonbaseIniFileG);
+
+                            // Auto hub-select
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDC_CHECK2));
+                            WritePrivateProfileString("Options", INI_KEY_AUTO_HUB_SELECT, sz, szMoonbaseIniFileG);
+
+                            // Smart camera
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDC_CHECK3));
+                            WritePrivateProfileString("Options", INI_KEY_SMART_CAMERA, sz, szMoonbaseIniFileG);
+
+                            // Auto-return camera
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDC_CHECK4));
+                            WritePrivateProfileString("Options", INI_KEY_AUTO_RETURN_CAMERA, sz, szMoonbaseIniFileG);
+
+                            // SFX volume
+                            wsprintf(sz, "%d", SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER1), TBM_GETPOS, 0, 0));
+                            WritePrivateProfileString("Options", INI_KEY_SFX_VOLUME, sz, szMoonbaseIniFileG);
+
+                            // Music volume
+                            wsprintf(sz, "%d", SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER2), TBM_GETPOS, 0, 0));
+                            WritePrivateProfileString("Options", INI_KEY_MUSIC_VOLUME, sz, szMoonbaseIniFileG);
+
+                            // Voice volume
+                            wsprintf(sz, "%d", SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER3), TBM_GETPOS, 0, 0));
+                            WritePrivateProfileString("Options", INI_KEY_VOICE_VOLUME, sz, szMoonbaseIniFileG);
+
+                            // Interface volume
+                            wsprintf(sz, "%d", SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER4), TBM_GETPOS, 0, 0));
+                            WritePrivateProfileString("Options", INI_KEY_INTERFACE_VOLUME, sz, szMoonbaseIniFileG);
+
+                            // Music quality (Low is TRUE, High is FALSE)
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDR_BUTTON1));
+                            WritePrivateProfileString("Options", INI_KEY_MUSIC_QUALITY, sz, szMoonbaseIniFileG);
+                            
+                            // Commentary
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDC_CHECK5));
+                            WritePrivateProfileString("Options", INI_KEY_COMMENTARY, sz, szMoonbaseIniFileG);
+
+                            EndDialog(hwndDlg, FALSE);
+                            break;
+                        }
+                    case IDCANCEL:
+                        {
+                            EndDialog(hwndDlg, FALSE);
+                            break;
+                        }
+                }
                 // Act on commands
                 return TRUE;
             }
@@ -872,8 +953,6 @@ BOOL CALLBACK JoinDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPar
    return FALSE; 
    } 
 
-   
-   
 BOOL CALLBACK HostDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
    { 
    switch (message) 
@@ -941,7 +1020,6 @@ BOOL CALLBACK HostDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPar
 
                return TRUE;
                }
-
 
             case IDOK:
                {
