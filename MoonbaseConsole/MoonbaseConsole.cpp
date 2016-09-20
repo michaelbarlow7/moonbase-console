@@ -1076,8 +1076,9 @@ BOOL CALLBACK HostDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPar
       case WM_INITDIALOG:
          {
          HWND hwndCtl = GetDlgItem(hwndDlg, IDC_COMBO1);
-         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://checkip.dyndns.org");
+         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://bot.whatismyipaddress.com");
          SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://api.ipify.org");
+         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"https://wtfismyip.com/text");
 
          char sz[1024];
          GetPrivateProfileString("MoonbaseConsole", "IPService", "http://api.ipify.org", sz, sizeof(sz), szMoonbaseIniFileG);

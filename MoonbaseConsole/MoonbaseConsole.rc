@@ -124,17 +124,17 @@ FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "IPAddress3",IDC_IPADDRESS1,"SysIPAddress32",WS_TABSTOP,
                     108,35,81,14
-    COMBOBOX        IDC_COMBO1,5,90,110,105,CBS_DROPDOWN | CBS_SORT | 
+    COMBOBOX        IDC_COMBO1,5,100,110,105,CBS_DROPDOWN | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Detect &Internet Address",IDC_BUTTON1,120,90,110,14
+    PUSHBUTTON      "Detect &Internet Address",IDC_BUTTON1,120,100,110,14
     PUSHBUTTON      "Detect &LAN Address",IDC_BUTTON3,63,140,110,14
     DEFPUSHBUTTON   "&Host",IDOK,5,180,110,14
     PUSHBUTTON      "Cancel",IDCANCEL,120,180,110,14
     LTEXT           "IP &Address:",IDC_STATIC,68,38,40,10
     LTEXT           "To host a game, enter your IP address in the box below and press the Host button. If you do not know your IP address, try one of the options below.",
                     IDC_STATIC,5,5,225,25
-    LTEXT           "If you are playing a game over the internet, pick a detection site from the list below and press the Detect Internet Address button.",
-                    IDC_STATIC,5,65,225,20
+    LTEXT           "If you are playing a game over the internet, pick a detection site from the list below and press the Detect Internet Address button. Note that you will need to forward ports 2300 TCP, 2350 UDP and 74624 TCP to your computer for this to work.",
+                    IDC_STATIC,5,65,225,35
     LTEXT           "If you are playing a game over a network, press the Detect LAN Address button.",
                     IDC_STATIC,5,120,225,15
     CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,5,165,
@@ -207,7 +207,7 @@ STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Change Player Name"
 FONT 8, "MS Sans Serif"
 BEGIN
-    EDITTEXT        IDC_EDIT2,5,20,100,14,ES_AUTOHSCROLL 
+    EDITTEXT        IDC_EDIT2,5,20,100,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "&OK",IDOK,129,7,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
     LTEXT           "Name:",IDC_STATIC,5,7,48,8
