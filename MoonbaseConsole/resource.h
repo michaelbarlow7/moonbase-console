@@ -43,6 +43,7 @@
 #define IDR_BUTTON2                     1047
 #define IDC_BUTTON10                    1048
 #define IDC_BUTTON11                    1049
+#define IDD_DIALOG5                     1050
 
 // Next default values for new objects
 // 

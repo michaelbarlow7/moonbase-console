@@ -73,6 +73,7 @@
 // 2.1    == 6 (public release)
 #define GAMENUM_VERSION 6
 
+#define NAME_CHAR_LIMIT 10
 // ini keys
 #define INI_KEY_NAME                        "name"
 #define INI_KEY_DAMAGE_BAR                  "0-0"
@@ -128,7 +129,7 @@ CGameInfo giG;
 DWORD dwIPAddressG = NULL;
 
 // Game settings variables
-char name[10];
+char name[NAME_CHAR_LIMIT];
 int damageBarPreference;
 int rangeRadiusPreference;
 int centerUnitPreference;
@@ -679,13 +680,63 @@ const char * getKeyStringFromInt(int key) {
     return NULL;
 
 }
+BOOL CALLBACK ChangeNameDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+   { 
+   switch (message) 
+      { 
+      case WM_INITDIALOG:
+         {
+             // Set the name in the edittext to the current name
+             SendMessage(GetDlgItem(hwndDlg, IDC_EDIT2), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
+             // Select the name
+             SendMessage(GetDlgItem(hwndDlg, IDC_EDIT2), EM_SETSEL, (WPARAM) 0, (LPARAM) -1);
+             // Set a limit on the number of characters in the edittext 
+             SendMessage(GetDlgItem(hwndDlg, IDC_EDIT2), EM_SETLIMITTEXT, (WPARAM) NAME_CHAR_LIMIT, (LPARAM) -1);
+
+             return TRUE; 
+         }
+  
+      case WM_COMMAND: 
+         switch (LOWORD(wParam)) 
+            {
+            case IDOK:
+               {
+                   char enteredName[NAME_CHAR_LIMIT];
+
+                   GetDlgItemText(hwndDlg, IDC_EDIT2, enteredName, NAME_CHAR_LIMIT);
+
+                   // If the entered name is nothing, we just treat it as a cancel
+                   if (!enteredName[0]){
+                       EndDialog(hwndDlg, FALSE);
+                   }else{
+                       strncpy(name, enteredName, NAME_CHAR_LIMIT);
+
+                       EndDialog(hwndDlg, TRUE);
+                   }
+               
+                   return TRUE;
+               }
+
+            case IDCANCEL:
+               {
+               EndDialog(hwndDlg, FALSE);
+
+               return TRUE;
+               }
+               
+            default:
+               return FALSE;
+            }
+      }
+   return FALSE; 
+   } 
 
 BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     switch(message){
         case WM_INITDIALOG:
             {
-                // Name can only be 10 characters long
-                GetPrivateProfileString("Options", INI_KEY_NAME, DEFAULT_PLAYER_NAME, name, sizeof(name), szMoonbaseIniFileG);
+                // Name can only be NAME_CHAR_LIMIT characters long
+                GetPrivateProfileString("user", INI_KEY_NAME, DEFAULT_PLAYER_NAME, name, sizeof(name), szMoonbaseIniFileG);
                 SendMessage(GetDlgItem(hwndDlg, IDC_TXT1), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
 
                 const char * keyString;
@@ -779,10 +830,19 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
             {
                 switch(LOWORD(wParam))
                 {
+                    case IDC_BUTTON1:
+                        {
+                            // Change name
+                            if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG5), hwndDlg, ChangeNameDlgProc, 0)){
+                                // Reset shown name
+                                SendMessage(GetDlgItem(hwndDlg, IDC_TXT1), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
+                            }
+                            break;
+                        }
                     case IDC_BUTTON10: 
                         {
                             // Reset
-                            strncpy(name, DEFAULT_PLAYER_NAME, 10);
+                            strncpy(name, DEFAULT_PLAYER_NAME, NAME_CHAR_LIMIT);
                             SendMessage(GetDlgItem(hwndDlg, IDC_TXT1), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
 
                             const char * keyString;

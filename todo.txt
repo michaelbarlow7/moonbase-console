@@ -1,0 +1,9 @@
+Just a running list of things I plan to do for this, so when I lose interest and pick it up again 9 months later I can see what needs to be done.
+
+- Add more IP address finder inputs
+- Implement change control dialog
+- Put self in credits
+- Update readme with changes
+- Increase version number
+- Add (symmetrical) (asymmetrical)
+- Make it work with steam version/multiple versions of Windows
