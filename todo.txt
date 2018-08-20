@@ -1,19 +1,15 @@
 Just a running list of things I plan to do for this, so when I lose interest and pick it up again 9 months later I can see what needs to be done. A plus means it's done.
 
 + Add more IP address finder inputs
-- Implement change control dialog
++ Implement change control dialog
+- Add (symmetrical) (asymmetrical) to Spiff and Katton respectively
+- Make it work with steam version/multiple versions of Windows
 - Put self in credits
 - Update readme with changes
 - Increase version number
-- Add (symmetrical) (asymmetrical) to Spiff and Katton respectively
-- Make it work with steam version/multiple versions of Windows
 - Upload .exe to somewhere, possibly Dropbox? PDrive? Or use Github releases
-- Put in smarts to find moonbase.ini. Maybe allow user to customise path? 
-- Toggle fullscreen from settings (may require access to registry)
-- Make the button IDs a little bit saner
 
-
-
-Maybe:
 - Use a different UI framework cos this one is really annoying to work with (Qt?)
 -- I think I'll do this for the next version, I hate this current framework. I'm going to make version 2.2 workable (if possibly buggy) and then direct my efforts to making a Qt version for 3.0)
+
+- Toggle fullscreen from settings (may require access to registry)
