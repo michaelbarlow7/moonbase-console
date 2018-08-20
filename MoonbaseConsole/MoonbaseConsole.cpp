@@ -864,12 +864,81 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 				OutputDebugString("Changing Damage");
                             if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
 				    damageBarPreference = changedKey;
-				    const char * keyString;
-				    keyString = getKeyStringFromInt(damageBarPreference);
+				    const char * keyString = getKeyStringFromInt(damageBarPreference);
 				    SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON2), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &damageBarPreference : (LPARAM) keyString));
                             }
                             break;
                         }
+		    case IDC_BUTTON3:
+                        {
+                            // Change Radius Range control
+                            if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+				    rangeRadiusPreference = changedKey;
+				    const char * keyString = getKeyStringFromInt(rangeRadiusPreference);
+				    SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON3), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &rangeRadiusPreference : (LPARAM) keyString));
+                            }
+                            break;
+                        }
+		    case IDC_BUTTON4:
+			{
+				// Change Center Unit control
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					centerUnitPreference = changedKey;
+					const char * keyString = getKeyStringFromInt(centerUnitPreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON4), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &centerUnitPreference : (LPARAM) keyString));
+				}
+				break;
+			}
+		    case IDC_BUTTON5:
+			{
+				// Change Next Unit control
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					nextUnitPreference = changedKey;
+					const char * keyString = getKeyStringFromInt(nextUnitPreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON5), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &nextUnitPreference : (LPARAM) keyString));
+				}
+				break;
+			}
+		    case IDC_BUTTON6:
+			{
+				// Change Previous Unit control
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					previousUnitPreference = changedKey;
+					const char * keyString = getKeyStringFromInt(previousUnitPreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON6), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &previousUnitPreference : (LPARAM) keyString));
+				}
+				break;
+			}
+		    case IDC_BUTTON7:
+			{
+				// Change Closest Launcher control
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					closestLauncherPreference = changedKey;
+					const char * keyString = getKeyStringFromInt(closestLauncherPreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON7), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &closestLauncherPreference : (LPARAM) keyString));
+				}
+				break;
+			}
+		    case IDC_BUTTON8:
+			{
+				// Change Show Attacked control
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					showAttackedPreference = changedKey;
+					const char * keyString = getKeyStringFromInt(showAttackedPreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON8), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &showAttackedPreference : (LPARAM) keyString));
+				}
+				break;
+			}
+		    case IDC_BUTTON9:
+			{
+				// Change Chat Toggle control
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					chatTogglePreference = changedKey;
+					const char * keyString = getKeyStringFromInt(chatTogglePreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON9), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &chatTogglePreference : (LPARAM) keyString));
+				}
+				break;
+			}
                     case IDC_BUTTON10: 
                         {
                             // Reset
