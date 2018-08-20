@@ -8,7 +8,7 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 //#include "afxres.h"
-#include "WinResrc.h"
+#include "winresrc.h"
 #define IDC_STATIC  -1
 
 /////////////////////////////////////////////////////////////////////////////
@@ -213,6 +213,17 @@ BEGIN
     LTEXT           "Name:",IDC_STATIC,5,7,48,8
 END
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// Change Key Dialog
+//
+IDD_DIALOG6 DIALOG DISCARDABLE  0, 0, 186, 46
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Change Key"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "Press a key...",IDC_PRESS_KEY,5,7,48,8
+END
 
 /////////////////////////////////////////////////////////////////////////////
 //

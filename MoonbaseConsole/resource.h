@@ -44,6 +44,8 @@
 #define IDC_BUTTON10                    1048
 #define IDC_BUTTON11                    1049
 #define IDD_DIALOG5                     1050
+#define IDD_DIALOG6                     1051
+#define IDC_PRESS_KEY                   1052
 
 // Next default values for new objects
 // 

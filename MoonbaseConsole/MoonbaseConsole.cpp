@@ -97,6 +97,7 @@
 
 // Default game options
 // TODO: Might put all defaults here for neatness' sake
+// The codes for each of these are ascii-codes
 #define DEFAULT_PLAYER_NAME                 "Commander"
 #define DEFAULT_CONTROL_DAMAGE_BAR          100
 #define DEFAULT_CONTROL_RANGE_RADIUS        114
@@ -122,6 +123,7 @@ char szMoonbasePathG[MAX_PATH];
 char szMoonbaseIniFileG[MAX_PATH];
 PROCESS_INFORMATION piG;
 HWND hwndDlgModelessG = NULL; 
+HWND changeKeyHwnd;
 HICON hIconG = NULL;
 HINSTANCE hInstanceG = NULL;
 int nReplayNumberHighestG;
@@ -138,6 +140,7 @@ int previousUnitPreference;
 int closestLauncherPreference;
 int showAttackedPreference;
 int chatTogglePreference;
+int changedKey;
 
 BOOL GetMoonbaseCommanderPath (void)
    {
@@ -664,11 +667,15 @@ DWORD DetectLANIPAddress (void)
    return dwRet;
    }
 
+/**
+ * These are the only keys aside from alphanumeric characters
+ * that are allowed in the game.
+ */
 const char * getKeyStringFromInt(int key) {
     if (key == 32){
         return "SPC";
     }
-    if (key == 10){
+    if (key == 8){ 
         return "BK";
     }
     if (key == 13){
@@ -731,9 +738,21 @@ BOOL CALLBACK ChangeNameDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
    return FALSE; 
    } 
 
+BOOL CALLBACK ChangeKeyDlgProc(HWND m_hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+    switch (uMsg)
+    {
+    case WM_INITDIALOG:
+	changeKeyHwnd = m_hwnd;
+	return TRUE;
+	break;
+    }
+    return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
+}
+
 BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     switch(message){
-        case WM_INITDIALOG:
+      case WM_INITDIALOG:
             {
                 // Name can only be NAME_CHAR_LIMIT characters long
                 GetPrivateProfileString("user", INI_KEY_NAME, DEFAULT_PLAYER_NAME, name, sizeof(name), szMoonbaseIniFileG);
@@ -836,6 +855,18 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
                             if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG5), hwndDlg, ChangeNameDlgProc, 0)){
                                 // Reset shown name
                                 SendMessage(GetDlgItem(hwndDlg, IDC_TXT1), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
+                            }
+                            break;
+                        }
+                    case IDC_BUTTON2:
+                        {
+                            // Change Damage Bar control
+				OutputDebugString("Changing Damage");
+                            if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+				    damageBarPreference = changedKey;
+				    const char * keyString;
+				    keyString = getKeyStringFromInt(damageBarPreference);
+				    SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON2), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &damageBarPreference : (LPARAM) keyString));
                             }
                             break;
                         }
@@ -1280,6 +1311,7 @@ BOOL CALLBACK DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
             case IDC_BUTTON4: //Settings
                {
+		       OutputDebugString("Game Options clicked");
                    if (!DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG4), hwndDlg, GameOptionsDlgProc, 0))
                        return TRUE; // bail if they cancel
                }
@@ -1561,8 +1593,32 @@ bool InitializeMBCStuff (LPSTR lpCmdLine)
    return true;
    }
 
+HHOOK g_hLowLevelKeyHook;
+/**
+ * This is used to capture keystrokes for redefining keys.
+ * Seems hacky but I blame Microsoft
+ */
+LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    KBDLLHOOKSTRUCT *pkbhs = (KBDLLHOOKSTRUCT *)lParam;
+    if (nCode == HC_ACTION && wParam == WM_KEYDOWN)
+    {
+	if (changeKeyHwnd != NULL){
+
+		UINT result = MapVirtualKey(pkbhs->vkCode, MAPVK_VK_TO_CHAR);
+		changedKey = tolower(result);
+		EndDialog(changeKeyHwnd, TRUE); 
+		changeKeyHwnd = NULL;
+	}
+
+    }
+    return CallNextHookEx(g_hLowLevelKeyHook, nCode, wParam, lParam);
+}
+
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
    {   
+	   g_hLowLevelKeyHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, GetModuleHandle(NULL), NULL);
+
    hInstanceG = hInstance;
 
    srand((unsigned)time(NULL));
