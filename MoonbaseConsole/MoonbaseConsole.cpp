@@ -66,6 +66,7 @@
 #include "GameInfo.h"
 #include <stdlib.h>
 #include <ctype.h>
+#include <set>
 
 
 // 1.0.15 == 4 (public release)
@@ -141,6 +142,7 @@ int closestLauncherPreference;
 int showAttackedPreference;
 int chatTogglePreference;
 int changedKey;
+std::set<int> preferenceSet;
 
 BOOL GetMoonbaseCommanderPath (void)
    {
@@ -798,6 +800,17 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
                 chatTogglePreference = GetPrivateProfileInt("Options", INI_KEY_CHAT_TOGGLE, DEFAULT_CONTROL_CHAT_TOGGLE, szMoonbaseIniFileG);
                 keyString = getKeyStringFromInt(chatTogglePreference);
                 SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON9), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &chatTogglePreference : (LPARAM) keyString));
+		
+		// We load up this set to avoid setting duplicates when settings keys for these
+		preferenceSet.clear();
+		preferenceSet.insert(damageBarPreference);
+		preferenceSet.insert(rangeRadiusPreference);
+		preferenceSet.insert(centerUnitPreference);
+		preferenceSet.insert(nextUnitPreference);
+		preferenceSet.insert(previousUnitPreference);
+		preferenceSet.insert(closestLauncherPreference);
+		preferenceSet.insert(showAttackedPreference);
+		preferenceSet.insert(chatTogglePreference);
 
                 // Auto scroll
                 BOOL autoScrollPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_SCROLL, DEFAULT_CONTROL_AUTO_SCROLL, szMoonbaseIniFileG);
@@ -862,16 +875,18 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
                         {
                             // Change Damage Bar control
 				OutputDebugString("Changing Damage");
+				preferenceSet.erase(damageBarPreference);
                             if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
 				    damageBarPreference = changedKey;
 				    const char * keyString = getKeyStringFromInt(damageBarPreference);
 				    SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON2), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &damageBarPreference : (LPARAM) keyString));
-                            }
+			    }
                             break;
                         }
 		    case IDC_BUTTON3:
                         {
                             // Change Radius Range control
+				preferenceSet.erase(rangeRadiusPreference);
                             if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
 				    rangeRadiusPreference = changedKey;
 				    const char * keyString = getKeyStringFromInt(rangeRadiusPreference);
@@ -882,6 +897,7 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 		    case IDC_BUTTON4:
 			{
 				// Change Center Unit control
+					preferenceSet.erase(centerUnitPreference);
 				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
 					centerUnitPreference = changedKey;
 					const char * keyString = getKeyStringFromInt(centerUnitPreference);
@@ -892,6 +908,7 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 		    case IDC_BUTTON5:
 			{
 				// Change Next Unit control
+					preferenceSet.erase(nextUnitPreference);
 				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
 					nextUnitPreference = changedKey;
 					const char * keyString = getKeyStringFromInt(nextUnitPreference);
@@ -902,6 +919,7 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 		    case IDC_BUTTON6:
 			{
 				// Change Previous Unit control
+					preferenceSet.erase(previousUnitPreference);
 				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
 					previousUnitPreference = changedKey;
 					const char * keyString = getKeyStringFromInt(previousUnitPreference);
@@ -912,6 +930,7 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 		    case IDC_BUTTON7:
 			{
 				// Change Closest Launcher control
+					preferenceSet.erase(closestLauncherPreference);
 				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
 					closestLauncherPreference = changedKey;
 					const char * keyString = getKeyStringFromInt(closestLauncherPreference);
@@ -922,6 +941,7 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 		    case IDC_BUTTON8:
 			{
 				// Change Show Attacked control
+					preferenceSet.erase(showAttackedPreference);
 				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
 					showAttackedPreference = changedKey;
 					const char * keyString = getKeyStringFromInt(showAttackedPreference);
@@ -932,6 +952,7 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 		    case IDC_BUTTON9:
 			{
 				// Change Chat Toggle control
+					preferenceSet.erase(chatTogglePreference);
 				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
 					chatTogglePreference = changedKey;
 					const char * keyString = getKeyStringFromInt(chatTogglePreference);
@@ -1673,9 +1694,12 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
     if (nCode == HC_ACTION && wParam == WM_KEYDOWN)
     {
 	if (changeKeyHwnd != NULL){
-
-		UINT result = MapVirtualKey(pkbhs->vkCode, MAPVK_VK_TO_CHAR);
-		changedKey = tolower(result);
+		UINT result = tolower(MapVirtualKey(pkbhs->vkCode, MAPVK_VK_TO_CHAR));
+		if (preferenceSet.insert(result).second == false){
+			// Already added, ignore
+			return CallNextHookEx(g_hLowLevelKeyHook, nCode, wParam, lParam);
+		}
+		changedKey = result;
 		EndDialog(changeKeyHwnd, TRUE); 
 		changeKeyHwnd = NULL;
 	}
