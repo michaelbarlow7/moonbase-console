@@ -30,7 +30,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDD_DIALOG1 DIALOG DISCARDABLE  0, 0, 337, 238
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Moonbase Console v2.1.26"
+CAPTION "Moonbase Console v2.2"
 FONT 8, "MS Sans Serif"
 BEGIN
     PUSHBUTTON      "&Join",IDC_BUTTON2,5,5,105,15
@@ -92,7 +92,7 @@ BEGIN
     LTEXT           "Emerau Glyph",IDC_STATIC,131,61,29,20
     LTEXT           "Ablation Laund",IDC_STATIC,131,43,30,16
     LTEXT           "Algorithm",IDC_STATIC,10,35,30,8
-    LTEXT           "Spiff algorithm is rotationally symmetrical. Katton algorithm is not.",IDC_STATIC,10,173,325,29
+    LTEXT           "Spiff algorithm is rotationally symmetrical. Katton algorithm is not. RUN THIS AS ADMINISTRATOR",IDC_STATIC,10,173,325,29
     GROUPBOX        "Game Options",IDC_STATIC,5,185,325,29
     PUSHBUTTON      "Se&ttings",IDC_BUTTON4,10,195,155,14
     PUSHBUTTON      "H&elp",IDC_BUTTON1,5,219,160,14

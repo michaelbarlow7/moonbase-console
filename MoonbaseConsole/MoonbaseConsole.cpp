@@ -47,6 +47,11 @@
 //         RELEASE
 // Version 2.1.26 Fixed bug that broke replays when a standard map was played.
 //                Fixed bug where random map not saved on first replay.
+// Version 2.2	  Updated domains for finding public IP address
+// 		  Added ability to change game options - anything you can change within
+// 		  Moonbase Commander's Game Options menu, you can change here too.
+// 		  Reverted functionality to find install location, you must put MoonbaseConsole.exe in the same location as Moonbase.exe for this to work.
+// 		  Modified UI a little bit.
 
 
 
@@ -72,7 +77,8 @@
 // 1.0.15 == 4 (public release)
 // 2.0.16 == 5 (leaked release)
 // 2.1    == 6 (public release)
-#define GAMENUM_VERSION 6
+// 2.2    == 7 (public release)
+#define GAMENUM_VERSION 7
 
 #define NAME_CHAR_LIMIT 10
 // ini keys
@@ -1418,7 +1424,9 @@ BOOL CALLBACK DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
                                    "\n"
                                    "Special thanks to Bwappo for his contest-winning thumbnail image.\n"
                                    "\n"
-                                   "A number of other people on the Moonbase Commander forums also contributed to map decoding or beta testing including Bwappo, Covak, florent28, Kamolas, llangford, and YorkdinK.\n",
+                                   "A number of other people on the Moonbase Commander forums also contributed to map decoding or beta testing including Bwappo, Covak, florent28, Kamolas, llangford, and YorkdinK.\n"
+                                   "\n"
+				   "Michael Barlow added the Game Options section and updated the functionality to attempt to get it working on machines in 2018.\n",
                                    "Moonbase Console Credits",
                                    MB_OK);
                return TRUE;
