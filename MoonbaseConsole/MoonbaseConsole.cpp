@@ -747,9 +747,15 @@ BOOL CALLBACK ChangeKeyDlgProc(HWND m_hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     case WM_INITDIALOG:
 	changeKeyHwnd = m_hwnd;
 	return TRUE;
-	break;
+    case WM_COMMAND: 
+	if (LOWORD(wParam) == IDCANCEL){
+	    EndDialog(m_hwnd, FALSE);
+	    changeKeyHwnd = NULL;
+
+	    return TRUE;
+	}
     }
-    return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
+    return FALSE;
 }
 
 BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -880,6 +886,8 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 				    damageBarPreference = changedKey;
 				    const char * keyString = getKeyStringFromInt(damageBarPreference);
 				    SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON2), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &damageBarPreference : (LPARAM) keyString));
+			    } else {
+				preferenceSet.insert(damageBarPreference);
 			    }
                             break;
                         }
@@ -891,6 +899,8 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 				    rangeRadiusPreference = changedKey;
 				    const char * keyString = getKeyStringFromInt(rangeRadiusPreference);
 				    SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON3), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &rangeRadiusPreference : (LPARAM) keyString));
+			    } else {
+				preferenceSet.insert(rangeRadiusPreference);
                             }
                             break;
                         }
@@ -902,6 +912,8 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 					centerUnitPreference = changedKey;
 					const char * keyString = getKeyStringFromInt(centerUnitPreference);
 					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON4), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &centerUnitPreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(centerUnitPreference);
 				}
 				break;
 			}
@@ -913,6 +925,8 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 					nextUnitPreference = changedKey;
 					const char * keyString = getKeyStringFromInt(nextUnitPreference);
 					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON5), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &nextUnitPreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(nextUnitPreference);
 				}
 				break;
 			}
@@ -924,6 +938,8 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 					previousUnitPreference = changedKey;
 					const char * keyString = getKeyStringFromInt(previousUnitPreference);
 					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON6), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &previousUnitPreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(previousUnitPreference);
 				}
 				break;
 			}
@@ -935,6 +951,8 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 					closestLauncherPreference = changedKey;
 					const char * keyString = getKeyStringFromInt(closestLauncherPreference);
 					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON7), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &closestLauncherPreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(closestLauncherPreference);
 				}
 				break;
 			}
@@ -946,6 +964,8 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 					showAttackedPreference = changedKey;
 					const char * keyString = getKeyStringFromInt(showAttackedPreference);
 					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON8), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &showAttackedPreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(showAttackedPreference);
 				}
 				break;
 			}
@@ -957,6 +977,8 @@ BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPAR
 					chatTogglePreference = changedKey;
 					const char * keyString = getKeyStringFromInt(chatTogglePreference);
 					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON9), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &chatTogglePreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(chatTogglePreference);
 				}
 				break;
 			}
