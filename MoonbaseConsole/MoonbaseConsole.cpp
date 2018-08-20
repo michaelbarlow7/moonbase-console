@@ -47,10 +47,15 @@
 //         RELEASE
 // Version 2.1.26 Fixed bug that broke replays when a standard map was played.
 //                Fixed bug where random map not saved on first replay.
+// Version 2.2	  Updated domains for finding public IP address
+// 		  Added ability to change game options - anything you can change within
+// 		  Moonbase Commander's Game Options menu, you can change here too.
+// 		  Reverted functionality to find install location, you must put MoonbaseConsole.exe in the same location as Moonbase.exe for this to work.
+// 		  Modified UI a little bit.
 
 
 
-#include "stdafx.h"
+#include "StdAfx.h"
 //#include <atlbase.h>
 #include <commctrl.h>
 #include <time.h>
@@ -58,35 +63,92 @@
 #include <winsock2.h>
 #include <shellapi.h>
 #include "resource.h"
-#include "..\Common\mbcmif.h"
-#include "..\Common\MBCMapImage.h"
+#include "mbcmif.h"
+#include "MBCMapImage.h"
 #include "Base64Encode.h"
 #include "SpiffGen.h"
 #include "KattonGen.h"
 #include "GameInfo.h"
 #include <stdlib.h>
 #include <ctype.h>
-
+#include <set>
 
 
 // 1.0.15 == 4 (public release)
 // 2.0.16 == 5 (leaked release)
 // 2.1    == 6 (public release)
-#define GAMENUM_VERSION 6
+// 2.2    == 7 (public release)
+#define GAMENUM_VERSION 7
 
+#define NAME_CHAR_LIMIT 10
+// ini keys
+#define INI_KEY_NAME                        "name"
+#define INI_KEY_DAMAGE_BAR                  "0-0"
+#define INI_KEY_RANGE_RADIUS                "0-1"
+#define INI_KEY_CENTER_UNIT                 "0-2"
+#define INI_KEY_NEXT_UNIT                   "0-3"
+#define INI_KEY_PREVIOUS_UNIT               "0-4"
+#define INI_KEY_CLOSEST_LAUNCHER            "0-5"
+#define INI_KEY_SHOW_ATTACKED               "0-6"
+#define INI_KEY_CHAT_TOGGLE                 "0-7"
+#define INI_KEY_AUTO_SCROLL                 "0-8"
+#define INI_KEY_AUTO_HUB_SELECT             "0-9"
+#define INI_KEY_SMART_CAMERA                "0-10"
+#define INI_KEY_AUTO_RETURN_CAMERA          "0-11"
+#define INI_KEY_SFX_VOLUME                  "0-12"
+#define INI_KEY_MUSIC_VOLUME                "0-13"
+#define INI_KEY_VOICE_VOLUME                "0-14"
+#define INI_KEY_INTERFACE_VOLUME            "0-15"
+#define INI_KEY_MUSIC_QUALITY               "0-16"
+#define INI_KEY_COMMENTARY                  "0-17"
+
+// Default game options
+// TODO: Might put all defaults here for neatness' sake
+// The codes for each of these are ascii-codes
+#define DEFAULT_PLAYER_NAME                 "Commander"
+#define DEFAULT_CONTROL_DAMAGE_BAR          100
+#define DEFAULT_CONTROL_RANGE_RADIUS        114
+#define DEFAULT_CONTROL_CENTER_UNIT         99
+#define DEFAULT_CONTROL_NEXT_UNIT           110
+#define DEFAULT_CONTROL_PREVIOUS_UNIT       112
+#define DEFAULT_CONTROL_CLOSEST_LAUNCHER    108
+#define DEFAULT_CONTROL_SHOW_ATTACKED       97
+#define DEFAULT_CONTROL_CHAT_TOGGLE         9
+#define DEFAULT_CONTROL_AUTO_SCROLL         FALSE
+#define DEFAULT_CONTROL_AUTO_HUB_SELECT     FALSE
+#define DEFAULT_CONTROL_SMART_CAMERA        FALSE
+#define DEFAULT_CONTROL_AUTO_RETURN_CAMERA  FALSE
+#define DEFAULT_CONTROL_SFX_VOLUME          255
+#define DEFAULT_CONTROL_MUSIC_VOLUME        96
+#define DEFAULT_CONTROL_VOICE_VOLUME        196
+#define DEFAULT_CONTROL_INTERFACE_VOLUME    196
+#define DEFAULT_CONTROL_MUSIC_QUALITY       FALSE
+#define DEFAULT_CONTROL_COMMENTARY          TRUE
 
 
 char szMoonbasePathG[MAX_PATH];
 char szMoonbaseIniFileG[MAX_PATH];
 PROCESS_INFORMATION piG;
 HWND hwndDlgModelessG = NULL; 
+HWND changeKeyHwnd;
 HICON hIconG = NULL;
 HINSTANCE hInstanceG = NULL;
 int nReplayNumberHighestG;
 CGameInfo giG;
 DWORD dwIPAddressG = NULL;
 
-
+// Game settings variables
+char name[NAME_CHAR_LIMIT];
+int damageBarPreference;
+int rangeRadiusPreference;
+int centerUnitPreference;
+int nextUnitPreference;
+int previousUnitPreference;
+int closestLauncherPreference;
+int showAttackedPreference;
+int chatTogglePreference;
+int changedKey;
+std::set<int> preferenceSet;
 
 BOOL GetMoonbaseCommanderPath (void)
    {
@@ -100,12 +162,14 @@ BOOL GetMoonbaseCommanderPath (void)
       {
       // Failed to find the registry key, try HEGAMES.INI
 
-      char szPath[MAX_PATH];
-      GetWindowsDirectory(szPath, MAX_PATH);
-      // assume GWD succeeded, why would it fail?
-      strcat(szPath, "\\HEGAMES.INI");
+      //char szPath[MAX_PATH];
+      //GetWindowsDirectory(szPath, MAX_PATH);
+      //// assume GWD succeeded, why would it fail?
+      //strcat(szPath, "\\HEGAMES.INI");
 
-      GetPrivateProfileString("Moonbase", "GameResourcePath", "", szMoonbasePathG, MAX_PATH, szPath);
+      //GetPrivateProfileString("Moonbase", "GameResourcePath", "", szMoonbasePathG, MAX_PATH, szPath);
+      
+      strcpy(szMoonbasePathG, ".\\"); // Just make it current directory for now 
       }
 
 
@@ -320,6 +384,7 @@ void EnableDialog (HWND hwnd, bool bEnable)
    EnableWindow(GetDlgItem(hwnd, IDC_BUTTON1), bEnable);
    EnableWindow(GetDlgItem(hwnd, IDC_BUTTON2), bEnable);
    EnableWindow(GetDlgItem(hwnd, IDC_BUTTON3), bEnable);
+   EnableWindow(GetDlgItem(hwnd, IDC_BUTTON4), bEnable);
    EnableWindow(GetDlgItem(hwnd, IDC_SINGLE_GENERATE), bEnable);
 
    EnableWindow(GetDlgItem(hwnd, IDC_SLIDER1), bEnable);
@@ -612,7 +677,473 @@ DWORD DetectLANIPAddress (void)
    return dwRet;
    }
 
+/**
+ * These are the only keys aside from alphanumeric characters
+ * that are allowed in the game.
+ */
+const char * getKeyStringFromInt(int key) {
+    if (key == 32){
+        return "SPC";
+    }
+    if (key == 8){ 
+        return "BK";
+    }
+    if (key == 13){
+        return "ENT";
+    }
+    if (key == 9){
+        return "TAB";
+    }
+    return NULL;
 
+}
+BOOL CALLBACK ChangeNameDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+   { 
+   switch (message) 
+      { 
+      case WM_INITDIALOG:
+         {
+             // Set the name in the edittext to the current name
+             SendMessage(GetDlgItem(hwndDlg, IDC_EDIT2), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
+             // Select the name
+             SendMessage(GetDlgItem(hwndDlg, IDC_EDIT2), EM_SETSEL, (WPARAM) 0, (LPARAM) -1);
+             // Set a limit on the number of characters in the edittext 
+             SendMessage(GetDlgItem(hwndDlg, IDC_EDIT2), EM_SETLIMITTEXT, (WPARAM) NAME_CHAR_LIMIT, (LPARAM) -1);
+
+             return TRUE; 
+         }
+  
+      case WM_COMMAND: 
+         switch (LOWORD(wParam)) 
+            {
+            case IDOK:
+               {
+                   char enteredName[NAME_CHAR_LIMIT];
+
+                   GetDlgItemText(hwndDlg, IDC_EDIT2, enteredName, NAME_CHAR_LIMIT);
+
+                   // If the entered name is nothing, we just treat it as a cancel
+                   if (!enteredName[0]){
+                       EndDialog(hwndDlg, FALSE);
+                   }else{
+                       strncpy(name, enteredName, NAME_CHAR_LIMIT);
+
+                       EndDialog(hwndDlg, TRUE);
+                   }
+               
+                   return TRUE;
+               }
+
+            case IDCANCEL:
+               {
+               EndDialog(hwndDlg, FALSE);
+
+               return TRUE;
+               }
+               
+            default:
+               return FALSE;
+            }
+      }
+   return FALSE; 
+   } 
+
+BOOL CALLBACK ChangeKeyDlgProc(HWND m_hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+    switch (uMsg)
+    {
+    case WM_INITDIALOG:
+	changeKeyHwnd = m_hwnd;
+	return TRUE;
+    case WM_COMMAND: 
+	if (LOWORD(wParam) == IDCANCEL){
+	    EndDialog(m_hwnd, FALSE);
+	    changeKeyHwnd = NULL;
+
+	    return TRUE;
+	}
+    }
+    return FALSE;
+}
+
+BOOL CALLBACK GameOptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch(message){
+      case WM_INITDIALOG:
+            {
+                // Name can only be NAME_CHAR_LIMIT characters long
+                GetPrivateProfileString("user", INI_KEY_NAME, DEFAULT_PLAYER_NAME, name, sizeof(name), szMoonbaseIniFileG);
+                SendMessage(GetDlgItem(hwndDlg, IDC_TXT1), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
+
+                const char * keyString;
+                // Damage bar preference:
+                damageBarPreference = GetPrivateProfileInt("Options", INI_KEY_DAMAGE_BAR, DEFAULT_CONTROL_DAMAGE_BAR, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(damageBarPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON2), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &damageBarPreference : (LPARAM) keyString));
+
+                // Range radius
+                rangeRadiusPreference = GetPrivateProfileInt("Options", INI_KEY_RANGE_RADIUS, DEFAULT_CONTROL_RANGE_RADIUS, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(rangeRadiusPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON3), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &rangeRadiusPreference : (LPARAM) keyString));
+
+                // Center unit
+                centerUnitPreference = GetPrivateProfileInt("Options", INI_KEY_CENTER_UNIT, DEFAULT_CONTROL_CENTER_UNIT, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(centerUnitPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON4), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &centerUnitPreference : (LPARAM) keyString));
+
+                // Next unit
+                nextUnitPreference = GetPrivateProfileInt("Options", INI_KEY_NEXT_UNIT, DEFAULT_CONTROL_NEXT_UNIT, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(nextUnitPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON5), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &nextUnitPreference : (LPARAM) keyString));
+
+                // Previous unit
+                previousUnitPreference = GetPrivateProfileInt("Options", INI_KEY_PREVIOUS_UNIT, DEFAULT_CONTROL_PREVIOUS_UNIT, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(previousUnitPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON6), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &previousUnitPreference : (LPARAM) keyString));
+
+                // Closest launcher
+                closestLauncherPreference = GetPrivateProfileInt("Options", INI_KEY_CLOSEST_LAUNCHER, DEFAULT_CONTROL_CLOSEST_LAUNCHER, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(closestLauncherPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON7), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &closestLauncherPreference : (LPARAM) keyString));
+
+                // Show attacked
+                showAttackedPreference = GetPrivateProfileInt("Options", INI_KEY_SHOW_ATTACKED, DEFAULT_CONTROL_SHOW_ATTACKED, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(showAttackedPreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON8), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &showAttackedPreference : (LPARAM) keyString));
+
+                // Chat toggle
+                chatTogglePreference = GetPrivateProfileInt("Options", INI_KEY_CHAT_TOGGLE, DEFAULT_CONTROL_CHAT_TOGGLE, szMoonbaseIniFileG);
+                keyString = getKeyStringFromInt(chatTogglePreference);
+                SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON9), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &chatTogglePreference : (LPARAM) keyString));
+		
+		// We load up this set to avoid setting duplicates when settings keys for these
+		preferenceSet.clear();
+		preferenceSet.insert(damageBarPreference);
+		preferenceSet.insert(rangeRadiusPreference);
+		preferenceSet.insert(centerUnitPreference);
+		preferenceSet.insert(nextUnitPreference);
+		preferenceSet.insert(previousUnitPreference);
+		preferenceSet.insert(closestLauncherPreference);
+		preferenceSet.insert(showAttackedPreference);
+		preferenceSet.insert(chatTogglePreference);
+
+                // Auto scroll
+                BOOL autoScrollPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_SCROLL, DEFAULT_CONTROL_AUTO_SCROLL, szMoonbaseIniFileG);
+                CheckDlgButton(hwndDlg, IDC_CHECK1, autoScrollPreference);
+
+                // Auto hub select
+                BOOL autoHubSelectPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_HUB_SELECT, DEFAULT_CONTROL_AUTO_HUB_SELECT, szMoonbaseIniFileG);
+                CheckDlgButton(hwndDlg, IDC_CHECK2, autoHubSelectPreference);
+
+                // Smart camera
+                BOOL smartCameraPreference = GetPrivateProfileInt("Options", INI_KEY_SMART_CAMERA, DEFAULT_CONTROL_SMART_CAMERA, szMoonbaseIniFileG);
+                CheckDlgButton(hwndDlg, IDC_CHECK3, smartCameraPreference);
+
+                // Auto return camera
+                BOOL autoReturnCameraPreference = GetPrivateProfileInt("Options", INI_KEY_AUTO_RETURN_CAMERA, DEFAULT_CONTROL_AUTO_RETURN_CAMERA, szMoonbaseIniFileG);
+                CheckDlgButton(hwndDlg, IDC_CHECK4, autoReturnCameraPreference);
+
+                // SFX volume
+                int sfxVolumePreference = GetPrivateProfileInt("Options", INI_KEY_SFX_VOLUME, DEFAULT_CONTROL_SFX_VOLUME, szMoonbaseIniFileG);
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER1), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER1), TBM_SETPOS, TRUE, sfxVolumePreference);  
+
+                // Music volume
+                int musicVolumePreference = GetPrivateProfileInt("Options", INI_KEY_MUSIC_VOLUME, DEFAULT_CONTROL_MUSIC_VOLUME, szMoonbaseIniFileG);
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER2), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER2), TBM_SETPOS, TRUE, musicVolumePreference);  
+
+                // Voice volume
+                int voiceVolumePreference = GetPrivateProfileInt("Options", INI_KEY_VOICE_VOLUME, DEFAULT_CONTROL_VOICE_VOLUME, szMoonbaseIniFileG);
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER3), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER3), TBM_SETPOS, TRUE, voiceVolumePreference);  
+
+                // Interface volume
+                int interfaceVolumePreference = GetPrivateProfileInt("Options", INI_KEY_INTERFACE_VOLUME, DEFAULT_CONTROL_INTERFACE_VOLUME, szMoonbaseIniFileG);
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER4), TBM_SETRANGE, (WPARAM) TRUE, (LPARAM) MAKELONG(0, 255));
+                SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER4), TBM_SETPOS, TRUE, interfaceVolumePreference);  
+
+                // Commentary
+                BOOL commentaryPreference = GetPrivateProfileInt("Options", INI_KEY_COMMENTARY, DEFAULT_CONTROL_COMMENTARY, szMoonbaseIniFileG);
+                CheckDlgButton(hwndDlg, IDC_CHECK5, commentaryPreference);
+
+                // Music quality (FALSE == high, TRUE == low)
+                BOOL musicQualityPreference = GetPrivateProfileInt("Options", INI_KEY_MUSIC_QUALITY, DEFAULT_CONTROL_MUSIC_QUALITY, szMoonbaseIniFileG);
+                CheckRadioButton(hwndDlg, IDR_BUTTON1, IDR_BUTTON2, musicQualityPreference ? IDR_BUTTON1 : IDR_BUTTON2);
+
+                return TRUE;
+            }
+        case WM_COMMAND:
+            {
+                switch(LOWORD(wParam))
+                {
+                    case IDC_BUTTON1:
+                        {
+                            // Change name
+                            if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG5), hwndDlg, ChangeNameDlgProc, 0)){
+                                // Reset shown name
+                                SendMessage(GetDlgItem(hwndDlg, IDC_TXT1), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
+                            }
+                            break;
+                        }
+                    case IDC_BUTTON2:
+                        {
+                            // Change Damage Bar control
+				OutputDebugString("Changing Damage");
+				preferenceSet.erase(damageBarPreference);
+                            if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+				    damageBarPreference = changedKey;
+				    const char * keyString = getKeyStringFromInt(damageBarPreference);
+				    SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON2), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &damageBarPreference : (LPARAM) keyString));
+			    } else {
+				preferenceSet.insert(damageBarPreference);
+			    }
+                            break;
+                        }
+		    case IDC_BUTTON3:
+                        {
+                            // Change Radius Range control
+				preferenceSet.erase(rangeRadiusPreference);
+                            if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+				    rangeRadiusPreference = changedKey;
+				    const char * keyString = getKeyStringFromInt(rangeRadiusPreference);
+				    SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON3), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &rangeRadiusPreference : (LPARAM) keyString));
+			    } else {
+				preferenceSet.insert(rangeRadiusPreference);
+                            }
+                            break;
+                        }
+		    case IDC_BUTTON4:
+			{
+				// Change Center Unit control
+					preferenceSet.erase(centerUnitPreference);
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					centerUnitPreference = changedKey;
+					const char * keyString = getKeyStringFromInt(centerUnitPreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON4), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &centerUnitPreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(centerUnitPreference);
+				}
+				break;
+			}
+		    case IDC_BUTTON5:
+			{
+				// Change Next Unit control
+					preferenceSet.erase(nextUnitPreference);
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					nextUnitPreference = changedKey;
+					const char * keyString = getKeyStringFromInt(nextUnitPreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON5), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &nextUnitPreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(nextUnitPreference);
+				}
+				break;
+			}
+		    case IDC_BUTTON6:
+			{
+				// Change Previous Unit control
+					preferenceSet.erase(previousUnitPreference);
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					previousUnitPreference = changedKey;
+					const char * keyString = getKeyStringFromInt(previousUnitPreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON6), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &previousUnitPreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(previousUnitPreference);
+				}
+				break;
+			}
+		    case IDC_BUTTON7:
+			{
+				// Change Closest Launcher control
+					preferenceSet.erase(closestLauncherPreference);
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					closestLauncherPreference = changedKey;
+					const char * keyString = getKeyStringFromInt(closestLauncherPreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON7), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &closestLauncherPreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(closestLauncherPreference);
+				}
+				break;
+			}
+		    case IDC_BUTTON8:
+			{
+				// Change Show Attacked control
+					preferenceSet.erase(showAttackedPreference);
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					showAttackedPreference = changedKey;
+					const char * keyString = getKeyStringFromInt(showAttackedPreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON8), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &showAttackedPreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(showAttackedPreference);
+				}
+				break;
+			}
+		    case IDC_BUTTON9:
+			{
+				// Change Chat Toggle control
+					preferenceSet.erase(chatTogglePreference);
+				if (DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG6), hwndDlg, ChangeKeyDlgProc, 0)){
+					chatTogglePreference = changedKey;
+					const char * keyString = getKeyStringFromInt(chatTogglePreference);
+					SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON9), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &chatTogglePreference : (LPARAM) keyString));
+				} else {
+					preferenceSet.insert(chatTogglePreference);
+				}
+				break;
+			}
+                    case IDC_BUTTON10: 
+                        {
+                            // Reset
+                            strncpy(name, DEFAULT_PLAYER_NAME, NAME_CHAR_LIMIT);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_TXT1), WM_SETTEXT, (WPARAM) TRUE, (LPARAM) name);
+
+                            const char * keyString;
+
+                            damageBarPreference =  DEFAULT_CONTROL_DAMAGE_BAR;
+                            keyString = getKeyStringFromInt(damageBarPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON2), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &damageBarPreference : (LPARAM) keyString));
+
+                            rangeRadiusPreference =  DEFAULT_CONTROL_RANGE_RADIUS;
+                            keyString = getKeyStringFromInt(rangeRadiusPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON3), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &rangeRadiusPreference : (LPARAM) keyString));
+
+                            centerUnitPreference =  DEFAULT_CONTROL_CENTER_UNIT;
+                            keyString = getKeyStringFromInt(centerUnitPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON4), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &centerUnitPreference : (LPARAM) keyString));
+
+                            nextUnitPreference = DEFAULT_CONTROL_NEXT_UNIT;
+                            keyString = getKeyStringFromInt(nextUnitPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON5), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &nextUnitPreference : (LPARAM) keyString));
+
+                            previousUnitPreference = DEFAULT_CONTROL_PREVIOUS_UNIT;
+                            keyString = getKeyStringFromInt(previousUnitPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON6), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &previousUnitPreference : (LPARAM) keyString));
+                            
+                            closestLauncherPreference = DEFAULT_CONTROL_CLOSEST_LAUNCHER;
+                            keyString = getKeyStringFromInt(closestLauncherPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON7), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &closestLauncherPreference : (LPARAM) keyString));
+
+                            showAttackedPreference = DEFAULT_CONTROL_SHOW_ATTACKED;
+                            keyString = getKeyStringFromInt(showAttackedPreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON8), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &showAttackedPreference : (LPARAM) keyString));
+                            
+                            chatTogglePreference = DEFAULT_CONTROL_CHAT_TOGGLE;
+                            keyString = getKeyStringFromInt(chatTogglePreference);
+                            SendMessage(GetDlgItem(hwndDlg, IDC_BUTTON9), WM_SETTEXT, (WPARAM) FALSE, (keyString == NULL ? (LPARAM) &chatTogglePreference : (LPARAM) keyString));
+
+                            CheckDlgButton(hwndDlg, IDC_CHECK1, DEFAULT_CONTROL_AUTO_SCROLL);
+
+                            CheckDlgButton(hwndDlg, IDC_CHECK2, DEFAULT_CONTROL_AUTO_HUB_SELECT);
+
+                            CheckDlgButton(hwndDlg, IDC_CHECK3, DEFAULT_CONTROL_SMART_CAMERA);
+
+                            CheckDlgButton(hwndDlg, IDC_CHECK4, DEFAULT_CONTROL_AUTO_RETURN_CAMERA);
+
+                            SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER1), TBM_SETPOS, TRUE, DEFAULT_CONTROL_SFX_VOLUME);  
+                            
+                            SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER2), TBM_SETPOS, TRUE, DEFAULT_CONTROL_MUSIC_VOLUME);  
+                            
+                            SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER3), TBM_SETPOS, TRUE, DEFAULT_CONTROL_VOICE_VOLUME);  
+                            
+                            SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER4), TBM_SETPOS, TRUE, DEFAULT_CONTROL_INTERFACE_VOLUME);  
+
+                            CheckDlgButton(hwndDlg, IDC_CHECK5, DEFAULT_CONTROL_COMMENTARY);
+
+                            CheckRadioButton(hwndDlg, IDR_BUTTON1, IDR_BUTTON2, DEFAULT_CONTROL_MUSIC_QUALITY ? IDR_BUTTON1 : IDR_BUTTON2);
+                            break;
+                        }
+                    case IDOK:
+                        {
+                            WritePrivateProfileString("user", INI_KEY_NAME, name, szMoonbaseIniFileG);
+
+                            char sz[4];
+
+                            // Damage bar
+                            wsprintf(sz, "%d", damageBarPreference);
+                            WritePrivateProfileString("Options", INI_KEY_DAMAGE_BAR, sz, szMoonbaseIniFileG);
+
+                            // Range radius
+                            wsprintf(sz, "%d", rangeRadiusPreference);
+                            WritePrivateProfileString("Options", INI_KEY_RANGE_RADIUS, sz, szMoonbaseIniFileG);
+
+                            // Center unit
+                            wsprintf(sz, "%d", centerUnitPreference);
+                            WritePrivateProfileString("Options", INI_KEY_CENTER_UNIT, sz, szMoonbaseIniFileG);
+
+                            // Next unit
+                            wsprintf(sz, "%d", nextUnitPreference);
+                            WritePrivateProfileString("Options", INI_KEY_NEXT_UNIT, sz, szMoonbaseIniFileG);
+
+                            // Previous unit
+                            wsprintf(sz, "%d", previousUnitPreference);
+                            WritePrivateProfileString("Options", INI_KEY_PREVIOUS_UNIT, sz, szMoonbaseIniFileG);
+
+                            // Closest launcher
+                            wsprintf(sz, "%d", closestLauncherPreference);
+                            WritePrivateProfileString("Options", INI_KEY_CLOSEST_LAUNCHER, sz, szMoonbaseIniFileG);
+
+                            // Show attacked
+                            wsprintf(sz, "%d", showAttackedPreference);
+                            WritePrivateProfileString("Options", INI_KEY_SHOW_ATTACKED, sz, szMoonbaseIniFileG);
+
+                            // Chat toggle
+                            wsprintf(sz, "%d", chatTogglePreference);
+                            WritePrivateProfileString("Options", INI_KEY_CHAT_TOGGLE, sz, szMoonbaseIniFileG);
+
+                            // Auto scroll
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDC_CHECK1));
+                            WritePrivateProfileString("Options", INI_KEY_AUTO_SCROLL, sz, szMoonbaseIniFileG);
+
+                            // Auto hub-select
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDC_CHECK2));
+                            WritePrivateProfileString("Options", INI_KEY_AUTO_HUB_SELECT, sz, szMoonbaseIniFileG);
+
+                            // Smart camera
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDC_CHECK3));
+                            WritePrivateProfileString("Options", INI_KEY_SMART_CAMERA, sz, szMoonbaseIniFileG);
+
+                            // Auto-return camera
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDC_CHECK4));
+                            WritePrivateProfileString("Options", INI_KEY_AUTO_RETURN_CAMERA, sz, szMoonbaseIniFileG);
+
+                            // SFX volume
+                            wsprintf(sz, "%d", SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER1), TBM_GETPOS, 0, 0));
+                            WritePrivateProfileString("Options", INI_KEY_SFX_VOLUME, sz, szMoonbaseIniFileG);
+
+                            // Music volume
+                            wsprintf(sz, "%d", SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER2), TBM_GETPOS, 0, 0));
+                            WritePrivateProfileString("Options", INI_KEY_MUSIC_VOLUME, sz, szMoonbaseIniFileG);
+
+                            // Voice volume
+                            wsprintf(sz, "%d", SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER3), TBM_GETPOS, 0, 0));
+                            WritePrivateProfileString("Options", INI_KEY_VOICE_VOLUME, sz, szMoonbaseIniFileG);
+
+                            // Interface volume
+                            wsprintf(sz, "%d", SendMessage(GetDlgItem(hwndDlg, IDC_SLIDER4), TBM_GETPOS, 0, 0));
+                            WritePrivateProfileString("Options", INI_KEY_INTERFACE_VOLUME, sz, szMoonbaseIniFileG);
+
+                            // Music quality (Low is TRUE, High is FALSE)
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDR_BUTTON1));
+                            WritePrivateProfileString("Options", INI_KEY_MUSIC_QUALITY, sz, szMoonbaseIniFileG);
+                            
+                            // Commentary
+                            wsprintf(sz, "%d", IsDlgButtonChecked(hwndDlg, IDC_CHECK5));
+                            WritePrivateProfileString("Options", INI_KEY_COMMENTARY, sz, szMoonbaseIniFileG);
+
+                            EndDialog(hwndDlg, FALSE);
+                            break;
+                        }
+                    case IDCANCEL:
+                        {
+                            EndDialog(hwndDlg, FALSE);
+                            break;
+                        }
+                }
+                // Act on commands
+                return TRUE;
+            }
+    }
+    return FALSE;
+}
 
 BOOL CALLBACK JoinDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
    { 
@@ -689,8 +1220,6 @@ BOOL CALLBACK JoinDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPar
    return FALSE; 
    } 
 
-   
-   
 BOOL CALLBACK HostDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
    { 
    switch (message) 
@@ -698,12 +1227,12 @@ BOOL CALLBACK HostDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPar
       case WM_INITDIALOG:
          {
          HWND hwndCtl = GetDlgItem(hwndDlg, IDC_COMBO1);
-         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://simple.showmyip.com");
-         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://www.whatismyip.com");
-         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://checkip.dyndns.org");
+         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://bot.whatismyipaddress.com");
+         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"http://api.ipify.org");
+         SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)"https://wtfismyip.com/text");
 
          char sz[1024];
-         GetPrivateProfileString("MoonbaseConsole", "IPService", "http://simple.showmyip.com", sz, sizeof(sz), szMoonbaseIniFileG);
+         GetPrivateProfileString("MoonbaseConsole", "IPService", "http://api.ipify.org", sz, sizeof(sz), szMoonbaseIniFileG);
          SendMessage(hwndCtl, WM_SETTEXT, NULL, (LPARAM)sz);
 
          int nValue;
@@ -759,7 +1288,6 @@ BOOL CALLBACK HostDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPar
 
                return TRUE;
                }
-
 
             case IDOK:
                {
@@ -896,10 +1424,20 @@ BOOL CALLBACK DlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
                                    "\n"
                                    "Special thanks to Bwappo for his contest-winning thumbnail image.\n"
                                    "\n"
-                                   "A number of other people on the Moonbase Commander forums also contributed to map decoding or beta testing including Bwappo, Covak, florent28, Kamolas, llangford, and YorkdinK.\n",
+                                   "A number of other people on the Moonbase Commander forums also contributed to map decoding or beta testing including Bwappo, Covak, florent28, Kamolas, llangford, and YorkdinK.\n"
+                                   "\n"
+				   "Michael Barlow added the Game Options section and updated the functionality to attempt to get it working on machines in 2018.\n",
                                    "Moonbase Console Credits",
                                    MB_OK);
                return TRUE;
+
+            case IDC_BUTTON4: //Settings
+               {
+		       OutputDebugString("Game Options clicked");
+                   if (!DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG4), hwndDlg, GameOptionsDlgProc, 0))
+                       return TRUE; // bail if they cancel
+               }
+
             
             case IDC_BTN_HOST_GAME:
                if (!DialogBoxParam(hInstanceG, MAKEINTRESOURCE(IDD_DIALOG3), hwndDlg, HostDlgProc, 0))
@@ -1177,8 +1715,35 @@ bool InitializeMBCStuff (LPSTR lpCmdLine)
    return true;
    }
 
+HHOOK g_hLowLevelKeyHook;
+/**
+ * This is used to capture keystrokes for redefining keys.
+ * Seems hacky but I blame Microsoft
+ */
+LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    KBDLLHOOKSTRUCT *pkbhs = (KBDLLHOOKSTRUCT *)lParam;
+    if (nCode == HC_ACTION && wParam == WM_KEYDOWN)
+    {
+	if (changeKeyHwnd != NULL){
+		UINT result = tolower(MapVirtualKey(pkbhs->vkCode, MAPVK_VK_TO_CHAR));
+		if (preferenceSet.insert(result).second == false){
+			// Already added, ignore
+			return CallNextHookEx(g_hLowLevelKeyHook, nCode, wParam, lParam);
+		}
+		changedKey = result;
+		EndDialog(changeKeyHwnd, TRUE); 
+		changeKeyHwnd = NULL;
+	}
+
+    }
+    return CallNextHookEx(g_hLowLevelKeyHook, nCode, wParam, lParam);
+}
+
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
    {   
+	   g_hLowLevelKeyHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, GetModuleHandle(NULL), NULL);
+
    hInstanceG = hInstance;
 
    srand((unsigned)time(NULL));

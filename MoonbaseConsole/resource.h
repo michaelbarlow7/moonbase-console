@@ -9,6 +9,7 @@
 #define IDD_DIALOG3                     109
 #define IDR_WIZ1                        110
 #define IDR_TXT1                        113
+#define IDC_TXT1                        114
 #define IDR_THM1                        115
 #define IDC_BUTTON2                     1003
 #define IDC_EDIT2                       1004
@@ -31,6 +32,20 @@
 #define IDC_EDIT1                       1036
 #define IDC_BUTTON3                     1037
 #define IDC_COMBO1                      1038
+#define IDC_BUTTON4                     1039
+#define IDD_DIALOG4                     1040
+#define IDC_BUTTON5                     1041
+#define IDC_BUTTON6                     1042
+#define IDC_BUTTON7                     1043
+#define IDC_BUTTON8                     1044
+#define IDC_BUTTON9                     1045
+#define IDR_BUTTON1                     1046
+#define IDR_BUTTON2                     1047
+#define IDC_BUTTON10                    1048
+#define IDC_BUTTON11                    1049
+#define IDD_DIALOG5                     1050
+#define IDD_DIALOG6                     1051
+#define IDC_PRESS_KEY                   1052
 
 // Next default values for new objects
 // 

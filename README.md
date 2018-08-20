@@ -2,7 +2,7 @@
 
 This is the source code to Moonbase Console, a helper program for [Moonbase Commander](http://en.wikipedia.org/wiki/Moonbase_Commander "Moonbase Commander") that generates random maps with particular parameters, and allows easy set-up of multiplayer matches via TCP/IP.
 
-I (Michael Barlow) didn't write this code (though I may add to it in the future). The code was given to me by Ernie Anderson (MYCROFT), and I simply added this file and the MIT license, and uploaded it to github.
+I (Michael Barlow) didn't write the majority of this code. The code was given to me by Ernie Anderson (MYCROFT), and I originally added this file and the MIT license, and uploaded it to github. I've since added a few more minor changes.
 
 Usage instructions are located in Moonbase Console\README.TXT. You will need to open the following ports to play multiplayer matches:
 
