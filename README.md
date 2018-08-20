@@ -1,3 +1,6 @@
+# DOWNLOAD MoonbaseConsole.exe FROM THE RELEASES TAB
+# PLACE MoonbaseConsole.exe IN THE SAME DIRECTORY AS Moonbase.exe AND RUN AS ADMINSTRATOR.
+
 # README
 
 This is the source code to Moonbase Console, a helper program for [Moonbase Commander](http://en.wikipedia.org/wiki/Moonbase_Commander "Moonbase Commander") that generates random maps with particular parameters, and allows easy set-up of multiplayer matches via TCP/IP.
