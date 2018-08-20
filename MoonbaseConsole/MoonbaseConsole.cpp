@@ -156,12 +156,14 @@ BOOL GetMoonbaseCommanderPath (void)
       {
       // Failed to find the registry key, try HEGAMES.INI
 
-      char szPath[MAX_PATH];
-      GetWindowsDirectory(szPath, MAX_PATH);
-      // assume GWD succeeded, why would it fail?
-      strcat(szPath, "\\HEGAMES.INI");
+      //char szPath[MAX_PATH];
+      //GetWindowsDirectory(szPath, MAX_PATH);
+      //// assume GWD succeeded, why would it fail?
+      //strcat(szPath, "\\HEGAMES.INI");
 
-      GetPrivateProfileString("Moonbase", "GameResourcePath", "", szMoonbasePathG, MAX_PATH, szPath);
+      //GetPrivateProfileString("Moonbase", "GameResourcePath", "", szMoonbasePathG, MAX_PATH, szPath);
+      
+      strcpy(szMoonbasePathG, ".\\"); // Just make it current directory for now 
       }
 
 
