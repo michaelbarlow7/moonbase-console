@@ -50,7 +50,7 @@
 
 
 
-#include "stdafx.h"
+#include "StdAfx.h"
 //#include <atlbase.h>
 #include <commctrl.h>
 #include <time.h>
@@ -58,8 +58,8 @@
 #include <winsock2.h>
 #include <shellapi.h>
 #include "resource.h"
-#include "..\Common\mbcmif.h"
-#include "..\Common\MBCMapImage.h"
+#include "mbcmif.h"
+#include "MBCMapImage.h"
 #include "Base64Encode.h"
 #include "SpiffGen.h"
 #include "KattonGen.h"

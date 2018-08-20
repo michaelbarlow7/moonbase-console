@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include "..\Common\mbcmif.h"
+#include "mbcmif.h"
 #include "GameInfo.h"
 
 int size; // 32, 40, 48, or 56
