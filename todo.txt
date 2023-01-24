@@ -12,4 +12,5 @@ Just a running list of things I plan to do for this, so when I lose interest and
 - Use a different UI framework cos this one is really annoying to work with (Qt?)
 -- I think I'll do this for the next version, I hate this current framework. I'm going to make version 2.2 workable (if possibly buggy) and then direct my efforts to making a Qt version for 3.0)
 
-- Toggle fullscreen from settings (may require access to registry)
+- Toggle fullscreen from settings (I think this just requires access to C:\Windows\hegames.ini)
+- Be smart about finding .exe path
