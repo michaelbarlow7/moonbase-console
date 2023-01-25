@@ -13,10 +13,6 @@ else
 	CC = g++
 endif
 
-#INCLUDE_DIRS = -I.\MoonbaseConsole -I.\Common
-#INCLUDE_DIRS = -I./MoonbaseConsole -I./Common
-#CC = g++
-#CC = i686-w64-mingw32-g++
 WARNS = -Wall
 CFLAGS = -O2 -D _WIN32_IE=0x0500 -D WINVER=0x500 ${WARNS}
 LDFLAGS = -lcomctl32 -lws2_32 -lwininet -static -mwindows
