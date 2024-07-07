@@ -1,5 +1,11 @@
-# DOWNLOAD MoonbaseConsole.exe FROM THE RELEASES TAB
-# PLACE MoonbaseConsole.exe IN THE SAME DIRECTORY AS Moonbase.exe AND RUN AS ADMINSTRATOR.
+## NOTE: This repository will soon be deprectated
+The random map generation is integrated into the latest builds of ScummVM, which is be the preferred way to play Moonbase Commander online. At the time of writing (July 8th 2024) this has been implemented in the ScummVM [daily builds](https://scummvm.org/downloads/#daily).
+
+If you would like to find opponents to play against, join the [Moonbase Commander discord server](https://discord.gg/6J8c7XW).
+
+# INSTRUCTIONS:
+- Download MoonbaseConsole.exe from the releases tab
+- Place MoonbaseConsole.exe in the same directory as Moonbase.exe and run as administrator.
 
 # README
 
